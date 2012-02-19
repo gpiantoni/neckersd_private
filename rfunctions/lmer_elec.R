@@ -16,7 +16,6 @@ maincond <- numeric(0)
 powcond <- numeric(0)
 
 for (e in levels(df$elec)){
-  print(e)
   lm1 <- lmer(dur ~ powlog * cond + (1|subj), subset(df, elec==e))
   mainpow[e] <- (summary(lm1))@coefs[2,3]
   maincond[e] <- (summary(lm1))@coefs[3,3]
