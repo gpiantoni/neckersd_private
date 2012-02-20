@@ -19,12 +19,10 @@ model1 <- lmer(dur ~ cond + (1|subj), data = dfp)
 model2 <- lmer(dur ~ cond + powlog + (1|subj), data = dfp)
 model3 <- lmer(powlog ~ cond + (1|subj), data = dfp)
 
-summary(model1)
-summary(model2)
-summary(model3)
+print(summary(model1)@coefs)
+print(summary(model2)@coefs)
+print(summary(model3)@coefs)
 
-r.2a <- summary(model2)@coefs[2,1]
-se.2a <- summary(model2)@coefs[2,2]
 r.2b <- summary(model2)@coefs[3,1]
 se.2b <- summary(model2)@coefs[3,2]
 

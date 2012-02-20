@@ -15,6 +15,18 @@ rdir = [cfg.scrp cfg.proj '_private/rfunctions/'];
 Rdata = [cfg.dpow 'dur_pow.Rdata'];
 elecbase = [cfg.dpow 'lmerelec'];
 load(cfg.sens.layout, 'layout')
+
+%-----------------%
+%-elec for specific analysis
+if iscell(cfg.callr.selelec)
+  label = cfg.callr.selelec;
+else
+  load(cfg.intor.elec, 'label')
+end
+
+s_elec = sprintf('''''%s'''',', label{:});
+selelec = ['c(' s_elec(1:end-1) ')']; 
+%-----------------%
 %---------------------------%
 
 %---------------------------%
@@ -50,18 +62,16 @@ end
 %---------------------------%
 % 3. lmer_dur_pow
 funname = [rdir 'lmer_dur_pow.R'];
-parietalelec = 'c(''E12'', ''E13'', ''E14'', ''E25'', ''E26'', ''E27'', ''E28'', ''E40'', ''E41'', ''E42'', ''E43'', ''E44'')';
 
-args = [Rdata ' ' cfg.log '.txt "' parietalelec '"'];
+args = [Rdata ' ' cfg.log '.txt "' selelec '"'];
 system(['Rscript ' funname ' ' args ]);
 %---------------------------%
 
 %---------------------------%
 % 4. mediation_dur
 funname = [rdir 'mediation_dur.R'];
-parietalelec = 'c(''E12'', ''E13'', ''E14'', ''E25'', ''E26'', ''E27'', ''E28'', ''E40'', ''E41'', ''E42'', ''E43'', ''E44'')';
 
-args = [Rdata ' ' cfg.log '.txt "' parietalelec '"'];
+args = [Rdata ' ' cfg.log '.txt "' selelec '"'];
 system(['Rscript ' funname ' ' args ]);
 %---------------------------%
 
