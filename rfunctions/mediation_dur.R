@@ -15,8 +15,13 @@ sink(args[[2]], append=TRUE)
 
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
 
+formula(model1)
 model1 <- lmer(dur ~ cond + (1|subj), data = dfp)
+
+formula(model2)
 model2 <- lmer(dur ~ cond + powlog + (1|subj), data = dfp)
+
+formula(model3)
 model3 <- lmer(powlog ~ cond + (1|subj), data = dfp)
 
 print(summary(model1)@coefs)
@@ -34,6 +39,7 @@ effvar <- r.3^2 * se.2b^2 + r.2b^2 * se.3^2
 serr <- sqrt(effvar)
 zvalue <- indir/serr
 
+print('zvalue')
 print(zvalue)
 sink()
 #-----------------#
