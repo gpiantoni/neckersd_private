@@ -24,7 +24,7 @@ else
   load(cfg.intor.elec, 'label')
 end
 
-s_elec = sprintf('''''%s'''',', label{:});
+s_elec = sprintf('''%s'',', label{:});
 selelec = ['c(' s_elec(1:end-1) ')']; 
 %-----------------%
 %---------------------------%
