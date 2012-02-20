@@ -38,11 +38,21 @@ if strcmp(cfg.intor.areas, 'manual')
   powpeak = cfg.intor.powpeak;
   
 elseif strcmp(cfg.intor.areas, 'powpeak')
+  
+  %-----------------%
   load([cfg.dpow cfg.proj '_grandpow'], 'gpow')
+  powthr = gpow{cfg.intor.poweffect}.powspctrm > cfg.intor.absthr;
+  if isempty(find(powthr))
+    thr = max(gpow{cfg.intor.poweffect}.powspctrm(:)) / 2;
+    powthr = gpow{cfg.intor.poweffect}.powspctrm > thr;
+    output = sprintf('%sNo significant elec-freq-time with % 4.f threshold. Using new threshold: % 4.f\n', ...
+      output, cfg.intor.absthr, thr);
+  end
+  %-----------------%
   
   %-----------------%
   %-get labels, time, freq above threshold
-  x = squeeze(sum(sum(gpow{cfg.intor.poweffect}.powspctrm > cfg.intor.absthr,1),3));
+  x = squeeze(sum(sum(powthr,1),3));
   lgrp_i = findbiggest(x);
   foi = gpow{cfg.intor.poweffect}.freq(lgrp_i);
   
@@ -52,7 +62,7 @@ elseif strcmp(cfg.intor.areas, 'powpeak')
   s_foix = sprintf('% 5.f  ', x(lgrp_i));
   %-------%
   
-  x = squeeze(sum(sum(gpow{cfg.intor.poweffect}.powspctrm > cfg.intor.absthr,1),2));
+  x = squeeze(sum(sum(powthr,1),2));
   lgrp_i = findbiggest(x);
   toi = gpow{cfg.intor.poweffect}.time(lgrp_i);
   
@@ -62,7 +72,7 @@ elseif strcmp(cfg.intor.areas, 'powpeak')
   s_toix = sprintf('% 5.f  ', x(lgrp_i));
   %-------%
   
-  x = squeeze(sum(sum(gpow{cfg.intor.poweffect}.powspctrm > cfg.intor.absthr,2),3));
+  x = squeeze(sum(sum(powthr,2),3));
   label = gpow{cfg.intor.poweffect}.label(find(x));
   
   %-------%
@@ -77,7 +87,7 @@ elseif strcmp(cfg.intor.areas, 'powpeak')
   powpeak(1).time = mean(toi);
   powpeak(1).wndw = range(toi)/2;
   powpeak(1).freq = mean(foi);
-  powpeak(1).band = range(foi)/2;
+  powpeak(1).band = range(foi);
   powpeak(1).name = sprintf('thr_freq%02.fat%04.f', mean(foi), mean(toi)*1e3);
   
   save(cfg.intor.elec, 'label')
@@ -145,7 +155,6 @@ for k = 1:numel(cfg.test)
   
   %-----------------%
   %-pow on peak
-  
   cfg1 = [];
   cfg1.method = 'mtmconvol';
   cfg1.output = 'pow';
