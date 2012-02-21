@@ -120,6 +120,8 @@ elseif strcmp(cfg.intor.areas, 'powpeak')
   %-----------------%
     
 end
+
+save([cfg.dpow 'r_powpeak'], 'powpeak') % used by exportneckersd
 %---------------------------%
 
 %-------------------------------------%
