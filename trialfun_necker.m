@@ -1,16 +1,5 @@
 function [trl, event] = trialfun_necker(cfg)
 
-% 12/02/04 fixneckerevent is a standalone function
-% 12/02/01 more consistent output and events
-% 09/07/17 created
-
-%-----------------%
-% set default for timing
-if ~isempty(cfg.trialdef.prestim);  prestim  = cfg.trialdef.prestim;  else prestim  = 2; end
-if ~isempty(cfg.trialdef.poststim); poststim = cfg.trialdef.poststim; else poststim = 2; end
-if prestim < 0; warning('the trial does not contain the marker'); end
-%-----------------%
-
 %-----------------%
 % read the header and event information
 warning off % creating fake channel names
