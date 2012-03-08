@@ -41,7 +41,7 @@ system(['Rscript ' funname ' ' args]);
 funname = [rdir 'lmer_elec.R'];
 args = [Rdata ' ' elecbase];
 system(['Rscript ' funname ' ' args]);
-eff = {'mainpow' 'maincond' 'powcond'};
+eff = {'mainpow' 'maincond' 'powcond' 'powns' 'powsd'};
 
 for i = 1:numel(eff)
   h = figure;  

@@ -169,9 +169,9 @@ for k = 1:numel(cfg.test)
   cfg1.keeptrials = 'yes';
   freq = ft_freqanalysis(cfg1, data);
   
-  pow = sum(freq.powspctrm,3);
-  powlog = sum(log(freq.powspctrm),3);
-  logpow = log(sum(freq.powspctrm,3));
+  pow = mean(freq.powspctrm,3);
+  powlog = mean(log(freq.powspctrm),3);
+  logpow = log(mean(freq.powspctrm,3));
   %-----------------%
   
   %-----------------%
