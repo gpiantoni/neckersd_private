@@ -63,8 +63,15 @@ end
 % 3. lmer_dur_pow
 funname = [rdir 'lmer_dur_pow.R'];
 
-args = [Rdata ' ' cfg.log '.txt "' selelec '"'];
+pngname = 'lmer_fitted';
+args = [Rdata ' ' cfg.log '.txt "' selelec '" ' [cfg.log filesep pngname '.png']];
 system(['Rscript ' funname ' ' args ]);
+
+%--------%
+%-save and link
+[~, logfile] = fileparts(cfg.log);
+system(['ln ' cfg.log filesep pngname '.png ' cfg.rslt pngname '_' logfile '.png']);
+%--------%
 %---------------------------%
 
 %---------------------------%

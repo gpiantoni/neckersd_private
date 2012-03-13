@@ -15,10 +15,11 @@ load(datfile)
 sink(args[[2]], append=TRUE)
 
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
+dfp <- aggregate(cbind(dur, logpow, powlog, pow) ~ subj + cond + trl, data = dfp, mean)
 
 model1 <- lmer(dur ~ cond + (1|subj), data = dfp)
-model2 <- lmer(dur ~ cond + powlog + (1|subj), data = dfp)
-model3 <- lmer(powlog ~ cond + (1|subj), data = dfp)
+model2 <- lmer(dur ~ cond + logpow + (1|subj), data = dfp)
+model3 <- lmer(logpow ~ cond + (1|subj), data = dfp)
 
 formula(model1)
 print(summary(model1)@coefs)
