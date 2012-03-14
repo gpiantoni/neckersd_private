@@ -4,7 +4,6 @@ function [cond output] = event2trl_inbetween(cfg, event)
 %   [cond output] = event2trl_inbetween(cfg, event)
 % where
 %   cfg is cfg.redef
-%
 %   cfg.redef.trigger = 'switch';
 %   cfg.redef.mindist = 1; % distance to following switch
 %   cfg.redef.maxdist = 60; % distance to following switch
@@ -13,12 +12,13 @@ function [cond output] = event2trl_inbetween(cfg, event)
 %   cfg.redef.overlap = 0.5; % percentage of overlap between trials
 % 
 %   cond is a struct with
-%     .name = 'tp'
+%     .name = 'between'
 %     .trl = [begsmp endsmp offset];
 %     .trialinfo = extra_trialinfo (optional)
 %   output is a text for output
-
-% 12/02/07 created, based on event2trl_necker
+%
+% Part of NECKERSD_PRIVATE
+% see also EVENT2TRL_NECKER
 
 %-----------------%
 %-create trl where there is a switch
@@ -40,9 +40,10 @@ trl = [];
 grouping = [];
 for i = 1:size(mrkbnd,1)
   trlbeg = [mrkbnd(i,1): begdist:mrkbnd(i,2)]';
-  trlnew = [trlbeg trlbeg+cfg.trldur*cfg.fsample];
-  trl = [trl; trlnew(trlnew(:,2) <= mrkbnd(i,2), :) ]; % only trials that end before the marker
-  grouping = [grouping; ones(size(trlnew,1)-1,1) * i];
+  trlnew = [trlbeg trlbeg+cfg.trldur*cfg.fsample-1];
+  trlnew = trlnew(trlnew(:,2) <= mrkbnd(i,2), :); % only trials that end before the marker
+  trl = [trl; trlnew];
+  grouping = [grouping; ones(size(trlnew,1),1) * i];
 end
 %-------%
 
@@ -54,8 +55,8 @@ info(:,3) = log(info(:,2));
 %-only keep switch if it's not too close to previous or following switch
 enoughdist = all(info(:,2) > cfg.mindist, 2) & all(info(:,2) < cfg.maxdist,2);
 
-cond(1).name = 'switch';
-cond(1).trl = trl(enoughdist,:);
+cond(1).name = 'between';
+cond(1).trl = [trl(enoughdist,:) ones(numel(find(enoughdist)),1)];
 cond(1).trialinfo = info(enoughdist,:);
 %-----------------%
 
