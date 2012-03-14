@@ -5,7 +5,7 @@
 #1. file of the dataset
 #2. output file
 #3. electrode list
-#4. 
+#4. name of pngfile
 args <- commandArgs(TRUE)
 #-----------------#
 

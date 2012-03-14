@@ -4,16 +4,18 @@ function [cond output] = event2trl_necker(cfg, event)
 %   [cond output] = event2trl_gosdtrl(cfg, event)
 % where
 %   cfg is cfg.redef
+%   cfg.redef.trigger = 'switch'
+%   cfg.redef.prestim: one scalar, time before switch
+%   cfg.redef.poststim: one scalar, time after switch
 %   
 %   cond is a struct with
-%     .name = 'tp'
-%     .trl = [begsmp endsmp offset extra_trialinfo];
+%     .name = 'switch'
+%     .trl = [begsmp endsmp offset];
 %     .trialinfo = extra_trialinfo (optional)
 %   output is a text for output
-
-% 12/02/07 take logarithm of durations afterwards
-% 12/02/06 trialinfo is a separate field
-% 12/02/03 created, based on event2trl_gosd
+%
+% Part of NECKERSD_PRIVATE
+% see also EVENT2TRL_INBETWEEN
 
 %-----------------%
 %-create trl where there is a switch
