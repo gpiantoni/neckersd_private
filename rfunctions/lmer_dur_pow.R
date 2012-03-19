@@ -26,8 +26,12 @@ dfp <- aggregate(cbind(dur, logpow, powlog, pow) ~ subj + cond + trl, data = dfp
 #-----------------#
 
 #-----------------#
+lm1 <- lmer(dur ~ logpow + (1|subj), subset(dfp, cond=='ns'))
+summary(lm1)
+#-----------------#
+
+#-----------------#
 #-model
-summary(dfp)
 lm1 <- lmer(dur ~ logpow * cond + (1|subj), dfp)
 summary(lm1)
 sink()
