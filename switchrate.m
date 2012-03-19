@@ -19,21 +19,10 @@ args{4} = sprintf('%03.f', cfg.switchrate.dur.steps*10);
 args{5} = sprintf('%03.f', cfg.switchrate.dur.bw*10);
 args{6} = sprintf('%sswitchrate_min%s_max%s_steps%s_bw%s.png', ...
   cfg.rslt, args{2}, args{3}, args{4}, args{5}); % PDF?
-outputname = [cfg.dpow 'switchrate_output.txt'];
-args{7} = outputname;
+args{7} = [cfg.log '.txt'];
 
 s_args = sprintf(' %s', args{:});
 system(['Rscript ' funname ' ' s_args]);
-%---------------------------%
-
-%---------------------------%
-% read and delete outputname
-fid = fopen(outputname); 
-outtmp = fgetl(fid);
-fclose(fid);
-delete(outputname)
-
-output = [output sprintf('switch rate significant at: %s\n', outtmp)];
 %---------------------------%
 
 %---------------------------%

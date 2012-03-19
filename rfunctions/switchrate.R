@@ -34,6 +34,14 @@ sr$durlog <- log(sr$dur)
 #-----------------#
 
 #-----------------#
+srs <- aggregate(cbind(dur, durlog) ~ subj + cond, data = sr, mean)
+sink(output, append=TRUE)
+mean(srs[srs$cond=='ns','dur'])
+mean(srs[srs$cond=='sd','dur'])
+t.test(srs[srs$cond=='ns','dur'], srs[srs$cond=='sd','dur'], paired=TRUE)
+#-----------------#
+
+#-----------------#
 (breakpoint <- seq(mindur,maxdur,steps))
 hns <- hist(subset(sr, cond=='ns' & dur > mindur & dur < maxdur)$dur, breaks=breakpoint)
 hsd <- hist(subset(sr, cond=='sd' & dur > mindur & dur < maxdur)$dur, breaks=breakpoint)
@@ -60,6 +68,17 @@ d <- rbind(d1, d2)
 #-----------------#
 
 #-----------------#
+#-write to file
+b1 <- hns$breaks[c(p.val < 0.05, FALSE)]
+b2 <- hns$breaks[c(FALSE, p.val < 0.05)]
+p <- p.val[p.val < 0.05]
+b1b2 <- sprintf('%1.f-%1.f (%4.3f)', b1, b2, p)
+
+print(paste(b1b2, collapse=' '))
+sink()
+#-----------------#
+
+#-----------------#
 #-make figure
 df.p <- data.frame(x=hns$mids[p.val < 0.05], y=.1, est=est[p.val < 0.05]>0)
 png(file=pngfile)
@@ -69,16 +88,4 @@ q + geom_point(aes(x=df.p$x, y=df.p$y, color=df.p$est)) +
   geom_vline(xintercept = mean(sr[sr$cond=='sd','dur']), color='red')
 
 dev.off()
-#-----------------#
-
-#-----------------#
-#-write to file
-b1 <- hns$breaks[c(p.val < 0.05, FALSE)]
-b2 <- hns$breaks[c(FALSE, p.val < 0.05)]
-p <- p.val[p.val < 0.05]
-b1b2 <- sprintf('%1.f-%1.f (%4.3f)', b1, b2, p)
-
-fid <- file(output)
-writeLines(paste(b1b2, collapse=' '), fid)
-close(fid)
 #-----------------#
