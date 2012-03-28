@@ -28,6 +28,8 @@ dfp <- aggregate(cbind(dur, logpow, powlog, pow) ~ subj + cond + trl, data = dfp
 #-----------------#
 lm1 <- lmer(dur ~ logpow + (1|subj), subset(dfp, cond=='ns'))
 summary(lm1)
+est.ns.pow <- summary(lm1)@coefs[2,1]
+t.ns.pow <- summary(lm1)@coefs[2,3]
 #-----------------#
 
 #-----------------#
@@ -47,7 +49,7 @@ t.cond <- summary(lm1)@coefs[3,3]
 
 est.int <- summary(lm1)@coefs[4,1]
 t.int <- summary(lm1)@coefs[4,3]
-tocsv <- c(est.pow, est.cond, est.int, t.pow, t.cond, t.int)
+tocsv <- c(est.ns.pow, t.ns.pow, est.pow, est.cond, est.int, t.pow, t.cond, t.int)
 
 infofile <- paste(substr(datfile, 1, nchar(datfile)-6), 'csv', sep='.')
 write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
