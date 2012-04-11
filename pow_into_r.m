@@ -42,7 +42,7 @@ elseif strcmp(cfg.intor.areas, 'powpeak')
   %-----------------%
   load([cfg.dpow cfg.proj '_grandpow'], 'gpow')
   powthr = gpow{cfg.intor.poweffect}.powspctrm > cfg.intor.absthr;
-  if isempty(find(powthr))
+  if isempty(find(powthr,1))
     thr = max(gpow{cfg.intor.poweffect}.powspctrm(:)) / 2;
     powthr = gpow{cfg.intor.poweffect}.powspctrm > thr;
     output = sprintf('%sNo significant elec-freq-time with % 4.f threshold. Using new threshold: % 4.f\n', ...
@@ -78,7 +78,7 @@ elseif strcmp(cfg.intor.areas, 'powpeak')
   %-------%
   %-feedback
   s_l = sprintf('\t%s', label{:});
-  s_lx = sprintf('\t%1.f', x(find(x)));
+  s_lx = sprintf('\t%1.f', x(x > 0));
   %-------%
   %-----------------%
   
@@ -126,6 +126,19 @@ save([cfg.dpow 'r_powpeak'], 'powpeak') % used by exportneckersd
 
 %-------------------------------------%
 %-loop over conditions
+%-----------------%
+%-assign day, based on subj number and condition
+subjday = [2 1 % EK
+  1 2 % HE
+  1 2 % MS
+  1 2 % MW
+  2 1 % NR
+  2 1 % RW
+  1 2 % TR
+  2 1]; % WM
+%-----------------%
+
+
 f = 1; % only first powpeak
 
 dat = '';
@@ -144,10 +157,17 @@ for k = 1:numel(cfg.test)
   if numel(allfile) > 1
     spcell = @(name) sprintf('%s%s', ddir, name);
     allname = cellfun(spcell, {allfile.name}, 'uni', 0);
+
+    dataall = [];
+    for i = 1:numel(allname)
+      load(allname{i}, 'data')
+      data.trialinfo = [data.trialinfo repmat(i, numel(data.trial), 1)];
+      dataall{i} = data;
+    end
     
     cfg1 = [];
-    cfg1.inputfile = allname;
-    data = ft_appenddata(cfg1);
+    data = ft_appenddata(cfg1, dataall{:});
+    clear dataall
     
   else
     load([ddir allfile(1).name], 'data')
@@ -178,9 +198,9 @@ for k = 1:numel(cfg.test)
   %-write to file
   for t = 1:size(pow,1);
     for e = 1:size(pow,2);
-      dat = sprintf('%s%03.f,%s,%1.f,%1f,%s,%1f,%1f,%1f\n', ....
+      dat = sprintf('%s%03.f,%s,%1.f,%1.f,%1.f,%1.f,%1f,%s,%1f,%1f,%1f\n', ....
         dat, ...
-        subj, condname{k}, t, data.trialinfo(t, cfg.intor.info), ...
+        subj, condname{k}, subjday(subj, k), data.trialinfo(t, end), t, data.trialinfo(t, cfg.intor.info), ...
         data.label{e}, pow(t,e), powlog(t,e), logpow(t,e));
     end
   end
