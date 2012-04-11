@@ -36,6 +36,7 @@ sr$durlog <- log(sr$dur)
 #-----------------#
 srs <- aggregate(cbind(dur, durlog) ~ subj + cond, data = sr, mean)
 sink(output, append=TRUE)
+srs$dur <- log(srs$dur)
 mean(srs[srs$cond=='ns','dur'])
 mean(srs[srs$cond=='sd','dur'])
 t.test(srs[srs$cond=='ns','dur'], srs[srs$cond=='sd','dur'], paired=TRUE)
