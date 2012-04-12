@@ -14,6 +14,8 @@ colnames(df) <- c('subj', 'cond', 'day', 'sess', 'trl', 'dur', 'elec', 'pow', 'p
 
 df$subj <- factor(df$subj)
 df$trl <- factor(df$trl)
+df$day <- factor(df$day)
+df$sess <- ordered(df$sess)
 
 save(df, file=args[[2]])
 #-----------------#

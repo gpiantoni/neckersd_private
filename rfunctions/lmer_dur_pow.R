@@ -23,10 +23,14 @@ load(datfile)
 sink(args[[2]], append=TRUE)
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
 dfp <- aggregate(cbind(dur, logpow, powlog, pow) ~ subj + cond + trl, data = dfp, mean)
+
+#aggregate transforms them into numberic again
+dfp$day <- factor(dfp$day)
+dfp$sess <- ordered(dfp$sess)
 #-----------------#
 
 #-----------------#
-lm1 <- lmer(dur ~ logpow + (1|subj), subset(dfp, cond=='ns'))
+lm1 <- lmer(dur ~ logpow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns'))
 summary(lm1)
 est.ns.pow <- summary(lm1)@coefs[2,1]
 t.ns.pow <- summary(lm1)@coefs[2,3]
@@ -34,7 +38,7 @@ t.ns.pow <- summary(lm1)@coefs[2,3]
 
 #-----------------#
 #-model
-lm1 <- lmer(dur ~ logpow * cond + (1|subj), dfp)
+lm1 <- lmer(dur ~ logpow * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
 summary(lm1)
 sink()
 #-----------------#
