@@ -22,7 +22,7 @@ datfile <- args[[1]]
 load(datfile)
 sink(args[[2]], append=TRUE)
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
-dfp <- aggregate(cbind(dur, logpow, powlog, pow) ~ subj + cond + trl, data = dfp, mean)
+dfp <- aggregate(cbind(dur, logpow, powlog, pow, day, sess) ~ subj + cond + trl, data = dfp, mean)
 
 #aggregate transforms them into numberic again
 dfp$day <- factor(dfp$day)
