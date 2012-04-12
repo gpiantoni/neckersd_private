@@ -14,6 +14,8 @@ datfile <- args[[1]]
 load(datfile)
 sink(args[[2]], append=TRUE)
 
+
+print('XXX Alpha Mediation of Sleep Deprivation and Perceptual Duration XXX')
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
 dfp <- aggregate(cbind(dur, logpow, powlog, pow) ~ subj + cond + trl, data = dfp, mean)
 

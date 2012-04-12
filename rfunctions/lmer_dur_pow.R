@@ -30,6 +30,7 @@ dfp$sess <- ordered(dfp$sess)
 #-----------------#
 
 #-----------------#
+print('XXX Power-Duration Correlation XXX')
 lm1 <- lmer(dur ~ logpow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns'))
 summary(lm1)
 est.ns.pow <- summary(lm1)@coefs[2,1]
@@ -37,14 +38,21 @@ t.ns.pow <- summary(lm1)@coefs[2,3]
 #-----------------#
 
 #-----------------#
+print('XXX Sleep Deprivation and Alpha Power (firstly) XXX')
+lm1 <- lmer(logpow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
+summary(lm1)
+#-----------------#
+
+#-----------------#
 #-model
+print('XXX Sleep Deprivation and Alpha Power (secondly) XXX')
 lm1 <- lmer(dur ~ logpow * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
 summary(lm1)
 sink()
 #-----------------#
 
 #-----------------#
-#-write to file
+#-write to file only the full model
 est.pow <- summary(lm1)@coefs[2,1]
 t.pow <- summary(lm1)@coefs[2,3]
 
