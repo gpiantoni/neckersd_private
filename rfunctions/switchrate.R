@@ -22,24 +22,26 @@ output <- args[[7]]
 
 #-----------------#
 #-library
+library(lme4)
 library(ggplot2)
 #-----------------#
 
 #-----------------#
 #-read and clean duration data
 sr <- read.table(filename, sep=',')
-names(sr) <- c('subj', 'cond', 'dur')
+names(sr) <- c('subj', 'cond', 'day', 'sess', 'dur')
 sr$subj <- factor(sr$subj)
+sr$cond <- factor(sr$cond)
+sr$day <- factor(sr$day)
+sr$sess <- ordered(sr$sess)
 sr$durlog <- log(sr$dur)
 #-----------------#
 
 #-----------------#
-srs <- aggregate(cbind(dur, durlog) ~ subj + cond, data = sr, mean)
+#-LMM for perceptual durations
 sink(output, append=TRUE)
-srs$dur <- log(srs$dur)
-mean(srs[srs$cond=='ns','dur'])
-mean(srs[srs$cond=='sd','dur'])
-t.test(srs[srs$cond=='ns','dur'], srs[srs$cond=='sd','dur'], paired=TRUE)
+lm1 <- lmer(durlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), sr)
+summary(lm1)
 #-----------------#
 
 #-----------------#

@@ -16,6 +16,18 @@ end
 
 %-------------------------------------%
 %-loop over test
+%-----------------%
+%-assign day, based on subj number and condition
+subjday = [2 1 % EK
+  1 2 % HE
+  1 2 % MS
+  1 2 % MW
+  2 1 % NR
+  2 1 % RW
+  1 2 % TR
+  2 1]; % WM
+%-----------------%
+
 getdur = @(x)[x(strcmp({x.type}, 'switch')).duration];
 dat = '';
 
@@ -27,38 +39,29 @@ for k = 1:numel(cfg.test)
   %-----------------%
   
   %-----------------%
-  %-concatenate only if you have more datasets
-  if numel(allfile) > 1
-    spcell = @(name) sprintf('%s%s', ddir, name);
-    allname = cellfun(spcell, {allfile.name}, 'uni', 0);
+  %-read data and concat dat
+  if numel(allfile) > 0
     
-    cfg1 = [];
-    cfg1.inputfile = allname;
-    data = ft_appenddata(cfg1);
-    
-  elseif numel(allfile) == 1
-    load([ddir allfile(1).name], 'data')
+    %-------%
+    %-loop over sessions
+    for i = 1:numel(allfile)
+      load([ddir allfile(i).name], 'data')
+      
+      event = ft_findcfg(data.cfg, 'event');
+      alldur = getdur(event);
+      
+      %-write to file
+      for t = 1:numel(alldur)
+        dat = sprintf('%s%1.f,%s,%1.f,%1.f,%1f\n', ....
+          dat, subj, condname{k}, subjday(subj, k), i, alldur(t));
+      end
+    end
+    %-------%
     
   else
     output = sprintf('%sCould not find any file in %s for test %s\n', ...
       output, ddir, cfg.test{k});
     
-  end
-  %-----------------%
-  
-  %-----------------%
-  alldur = [];
-  for i = 1:numel(data.cfg.previous)
-    event = ft_findcfg(data.cfg.previous{i}, 'event');
-    alldur = [alldur getdur(event)];
-  end
-  %-----------------%
-  
-  %-----------------%
-  %-write to file
-  for i = 1:numel(alldur)
-    dat = sprintf('%s%1.f,%s,%1f\n', ....
-      dat, subj, condname{k}, alldur(i));
   end
   %-----------------%
   
