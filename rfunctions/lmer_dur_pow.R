@@ -12,7 +12,6 @@ args <- commandArgs(TRUE)
 #-----------------#
 #-library
 library('lme4')
-options(contrasts=c("contr.sum", "contr.poly"))
 library('ggplot2')
 #-----------------#
 
@@ -30,7 +29,8 @@ dfp$sess <- ordered(dfp$sess)
 #-----------------#
 
 #-----------------#
-print('XXX Power-Duration Correlation XXX')
+print('XXX Power-Duration Correlation (NS) XXX')
+options(contrasts=c("contr.sum", "contr.poly"))
 lm1 <- lmer(dur ~ logpow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns'))
 summary(lm1)
 est.ns.pow <- summary(lm1)@coefs[2,1]
@@ -38,14 +38,24 @@ t.ns.pow <- summary(lm1)@coefs[2,3]
 #-----------------#
 
 #-----------------#
-print('XXX Sleep Deprivation and Alpha Power (firstly) XXX')
+print('XXX Sleep Deprivation and Alpha Power (1) XXX')
+options(contrasts=c("contr.treatment", "contr.poly")) # easier to interpret with treatment
 lm1 <- lmer(logpow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
 summary(lm1)
 #-----------------#
 
 #-----------------#
+print('XXX Sleep Deprivation and Alpha Power (2) XXX')
+lm1 <- lmer(dur ~ logpow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='sd'))
+summary(lm1)
+est.ns.pow <- summary(lm1)@coefs[2,1]
+t.ns.pow <- summary(lm1)@coefs[2,3]
+#-----------------#
+
+#-----------------#
 #-model
 print('XXX Sleep Deprivation and Alpha Power (secondly) XXX')
+options(contrasts=c("contr.sum", "contr.poly"))
 lm1 <- lmer(dur ~ logpow * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
 summary(lm1)
 sink()
