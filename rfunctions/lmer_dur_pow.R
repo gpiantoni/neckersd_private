@@ -30,8 +30,7 @@ dfp$sess <- ordered(dfp$sess)
 
 #-----------------#
 print('XXX Power-Duration Correlation (NS) XXX')
-options(contrasts=c("contr.sum", "contr.poly"))
-lm1 <- lmer(dur ~ logpow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns'))
+lm1 <- lmer(dur ~ powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns'))
 summary(lm1)
 est.ns.pow <- summary(lm1)@coefs[2,1]
 t.ns.pow <- summary(lm1)@coefs[2,3]
@@ -39,24 +38,20 @@ t.ns.pow <- summary(lm1)@coefs[2,3]
 
 #-----------------#
 print('XXX Sleep Deprivation and Alpha Power (1) XXX')
-options(contrasts=c("contr.treatment", "contr.poly")) # easier to interpret with treatment
-lm1 <- lmer(logpow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
+lm1 <- lmer(powlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
 summary(lm1)
 #-----------------#
 
 #-----------------#
 print('XXX Sleep Deprivation and Alpha Power (2) XXX')
-lm1 <- lmer(dur ~ logpow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='sd'))
+lm1 <- lmer(dur ~ powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='sd'))
 summary(lm1)
-est.ns.pow <- summary(lm1)@coefs[2,1]
-t.ns.pow <- summary(lm1)@coefs[2,3]
 #-----------------#
 
 #-----------------#
 #-model
-print('XXX Sleep Deprivation and Alpha Power (secondly) XXX')
-options(contrasts=c("contr.sum", "contr.poly"))
-lm1 <- lmer(dur ~ logpow * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
+print('XXX Sleep Deprivation and Alpha Power (3) XXX')
+lm1 <- lmer(dur ~ powlog * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
 summary(lm1)
 sink()
 #-----------------#
@@ -81,7 +76,7 @@ write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
 #-plot
 png(filename=args[[4]])
 dfp$durfit <- fitted(lm1)
-q <- ggplot(dfp, aes(x=logpow, y=durfit, color=cond))
+q <- ggplot(dfp, aes(x=powlog, y=durfit, color=cond))
 q + geom_point() + facet_grid(subj ~ .)
 dev.off()
 #-----------------#
