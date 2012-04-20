@@ -40,7 +40,7 @@ if strcmp(cfg.intor.areas, 'manual')
 elseif strcmp(cfg.intor.areas, 'powpeak')
   
   %-----------------%
-  load([cfg.dpow cfg.proj '_grandpow'], 'gpow')
+  load([cfg.dcor cfg.proj '_grandpow'], 'gpow')
   powthr = gpow{cfg.intor.poweffect}.powspctrm > cfg.intor.absthr;
   if isempty(find(powthr,1))
     thr = max(gpow{cfg.intor.poweffect}.powspctrm(:)) / 2;
@@ -121,7 +121,7 @@ elseif strcmp(cfg.intor.areas, 'powpeak')
     
 end
 
-save([cfg.dpow 'r_powpeak'], 'powpeak') % used by exportneckersd
+save([cfg.dcor 'r_powpeak'], 'powpeak') % used by exportneckersd
 %---------------------------%
 
 %-------------------------------------%
@@ -137,7 +137,6 @@ subjday = [2 1 % EK
   1 2 % TR
   2 1]; % WM
 %-----------------%
-
 
 f = 1; % only first powpeak
 

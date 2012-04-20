@@ -12,8 +12,8 @@ tic_t = tic;
 %---------------------------%
 %-common
 rdir = [cfg.scrp cfg.proj '_private/rfunctions/'];
-Rdata = [cfg.dpow 'dur_pow.Rdata'];
-elecbase = [cfg.dpow 'lmerelec'];
+Rdata = [cfg.dcor 'dur_pow.Rdata'];
+elecbase = [cfg.dcor 'lmerelec'];
 load(cfg.sens.layout, 'layout')
 
 %-----------------%

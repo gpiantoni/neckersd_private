@@ -5,7 +5,7 @@ output = 'LMER,';
 
 %-----------------%
 %-pow peak
-load([cfg.dpow 'r_powpeak'], 'powpeak')
+load([cfg.dcor 'r_powpeak'], 'powpeak')
 f = 1;
 output = [output sprintf('%s,%1.3f,%1.3f,%1.3f,%1.3f,', ...
       powpeak(f).name, powpeak(f).time, powpeak(f).wndw, powpeak(f).freq, powpeak(f).band)];
@@ -23,7 +23,7 @@ nelec = numel(label);
 
 %-----------------%
 %-read results
-extradata = [cfg.dpow 'dur_pow.csv'];
+extradata = [cfg.dcor 'dur_pow.csv'];
 lmerinfo = dlmread(extradata);
 s_lmer = sprintf('%1f,', lmerinfo);
 %-----------------%
@@ -37,8 +37,8 @@ output = [output sprintf('%1.f,%s', nelec, s_lmer)];
 %-clean up files
 delete(extradata)
 delete([extradata(1:end-3) 'Rdata'])
-delete([cfg.dpow 'r_powpeak.mat'])
-delete([cfg.dpow 'lmerelec*']);
+delete([cfg.dcor 'r_powpeak.mat'])
+delete([cfg.dcor 'lmerelec*']);
 if isfield(cfg.intor, 'elec')
   delete(cfg.intor.elec)
 end

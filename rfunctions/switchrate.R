@@ -46,9 +46,15 @@ summary(lm1)
 #-----------------#
 
 #-----------------#
+dur_ns <- subset(sr, cond=='ns' & dur > mindur & dur < maxdur)$dur
+dur_sd <- subset(sr, cond=='sd' & dur > mindur & dur < maxdur)$dur
+ks.test(dur_ns, dur_sd)
+#-----------------#
+
+#-----------------#
 (breakpoint <- seq(mindur,maxdur,steps))
-hns <- hist(subset(sr, cond=='ns' & dur > mindur & dur < maxdur)$dur, breaks=breakpoint)
-hsd <- hist(subset(sr, cond=='sd' & dur > mindur & dur < maxdur)$dur, breaks=breakpoint)
+hns <- hist(dur_ns, breaks=breakpoint)
+hsd <- hist(dur_sd, breaks=breakpoint)
 h <- data.frame(ns = hns$counts, sd = hsd$counts)
 
 p.val <- 0
