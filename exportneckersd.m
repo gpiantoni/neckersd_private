@@ -30,6 +30,13 @@ s_lmer = sprintf('%1f,', lmerinfo);
 
 %-----------------%
 %-prepare output
+% columns contain:
+% 1- lmer powlog only ns
+% 2- lmer powlog only sd
+% 3- lmer powlog X cond: powlog
+% 4- lmer powlog X cond: cond
+% 5- lmer powlog X cond: interaction
+% 6- lmer mediation
 output = [output sprintf('%1.f,%s', nelec, s_lmer)];
 %-----------------%
 
