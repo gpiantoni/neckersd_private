@@ -40,6 +40,6 @@ cond(1).trialinfo = info(enoughdist,:);
 
 %-----------------%
 %-output
-output = sprintf('   n events:% 3.f (total switch:% 3.f at mindist% 2.fs, maxdist% 2.fs)\n', ...
-  numel(find(enoughdist)), numel(mrk), cfg.mindist, cfg.maxdist);
+output = sprintf('   n events:% 3.f (total switch:% 3d at mindist% 4.2fs, maxdist% 4.2fs)\n', ...
+  numel(find(enoughdist)), numel(mrk), min(info(:,2)), max(info(:,2)));
 %-----------------%

@@ -21,7 +21,7 @@ tic_t = tic;
 
 %---------------------------%
 %-dir and files
-ddir = sprintf('%s%04.f/%s/%s/', cfg.data, subj, cfg.mod, cfg.cond); % data
+ddir = sprintf('%s%04.f/%s/%s/', cfg.data, subj, cfg.mod, cfg.nick); % data
 if isdir(ddir); rmdir(ddir, 's'); end
 mkdir(ddir)
 
@@ -100,7 +100,7 @@ for i = 1:10
     end
     
     rawname = sprintf('%s_%04.f_%s_%s-%s_%03.f_%s', ...
-      cfg.rec, subj, cfg.mod, cfg.cond, nssd, sess, mfilename);
+      cfg.rec, subj, cfg.mod, cfg.nick, nssd, sess, mfilename);
     disp(rawname)
     data = ft_selectdata(data, 'channel', cfg.seldata.channel);
     save([ddir rawname], 'data')

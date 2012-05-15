@@ -20,14 +20,14 @@ tic_t = tic;
 
 %---------------------------%
 %-dir and files
-ddir = sprintf('%s%04.f/%s/%s/', cfg.data, subj, cfg.mod, cfg.cond); % data
+ddir = sprintf('%s%04.f/%s/%s/', cfg.data, subj, cfg.mod, cfg.nick); % data
 load(cfg.sens.layout, 'layout')
 
 %-------%
 %-get cond names
-uniquecond = eq(cfg.test{1}, cfg.test{2});
-for i = 1:numel(cfg.test)
-  condname{i} = cfg.test{i}(~uniquecond);
+uniquecond = eq(cfg.intor.cond{1}, cfg.intor.cond{2});
+for i = 1:numel(cfg.intor.cond)
+  condname{i} = cfg.intor.cond{i}(~uniquecond);
 end
 %-------%
 %---------------------------%
@@ -141,11 +141,11 @@ subjday = [2 1 % EK
 f = 1; % only first powpeak
 
 dat = '';
-for k = 1:numel(cfg.test)
+for k = 1:numel(cfg.intor.cond)
   
   %-----------------%
   %-input and output for each condition
-  allfile = dir([ddir cfg.test{k} cfg.endname '.mat']); % files matching a preprocessing
+  allfile = dir([ddir cfg.intor.cond{k} cfg.endname '.mat']); % files matching a preprocessing
   if isempty(allfile)
     continue
   end
@@ -160,7 +160,7 @@ for k = 1:numel(cfg.test)
     cfg1.method = 'mtmfft';
     cfg1.output = 'pow';
     cfg1.taper = 'hanning';
-    cfg1.foi = powpeak(f).freq + [-.5:.1:.5] * powpeak(f).band;
+    cfg1.foilim = powpeak(f).freq;
     cfg1.feedback = 'none';
     cfg1.keeptrials = 'yes';
     freq = ft_freqanalysis(cfg1, data);

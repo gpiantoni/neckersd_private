@@ -30,7 +30,7 @@ inbetween = [event(mrk).duration]';
 %-------%
 %-avoid data just around the switch
 mrkbnd(:,1) = mrkbnd(:,1) + cfg.fsample * cfg.pad;
-mrkbnd(:,2) = mrkbnd(:,2) - cfg.fsample * cfg.pad;
+mrkbnd(:,2) = mrkbnd(:,2) - cfg.fsample * cfg.pad - 1;
 %-------%
 
 %-------%
@@ -63,5 +63,5 @@ cond(1).trialinfo = info(enoughdist,:);
 %-----------------%
 %-output
 output = sprintf('   n events:% 3.f (total switch:% 3d at mindist% 4.2fs, maxdist% 4.2fs)\n', ...
-  numel(find(enoughdist)), numel(mrk), cfg.mindist, cfg.maxdist);
+  numel(find(enoughdist)), numel(mrk), min(cond(1).trialinfo(:,2)), max(cond(1).trialinfo(:,2)));
 %-----------------%
