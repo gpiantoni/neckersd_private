@@ -2,15 +2,6 @@ function pow_into_r(cfg, subj)
 %POW_INTO_R convert power data into R
 % only one time point and frequency
 
-% 12/02/19 gives output
-
-%-----------------%
-%-input
-if nargin == 1
-  subj = cfg.subj;
-end
-%-----------------%
-
 %---------------------------%
 %-start log
 output = sprintf('(p%02.f) %s started at %s on %s\n', ...
@@ -34,93 +25,7 @@ end
 
 %---------------------------%
 %-use predefined or power-peaks for areas of interest
-if strcmp(cfg.intor.areas, 'manual')
-  powpeak = cfg.intor.powpeak;
-  
-elseif strcmp(cfg.intor.areas, 'powpeak')
-  
-  %-----------------%
-  load([cfg.dcor cfg.proj '_grandpow'], 'gpow')
-  powthr = gpow{cfg.intor.poweffect}.powspctrm > cfg.intor.absthr;
-  if isempty(find(powthr,1))
-    thr = max(gpow{cfg.intor.poweffect}.powspctrm(:)) / 2;
-    powthr = gpow{cfg.intor.poweffect}.powspctrm > thr;
-    output = sprintf('%sNo significant elec-freq-time with % 4.f threshold. Using new threshold: % 4.f\n', ...
-      output, cfg.intor.absthr, thr);
-  end
-  %-----------------%
-  
-  %-----------------%
-  %-get labels, time, freq above threshold
-  x = squeeze(sum(sum(powthr,1),3));
-  lgrp_i = findbiggest(x);
-  foi = gpow{cfg.intor.poweffect}.freq(lgrp_i);
-  
-  %-------%
-  %-feedback
-  s_foi = sprintf('% 7.1f', foi);
-  s_foix = sprintf('% 5.f  ', x(lgrp_i));
-  %-------%
-  
-  x = squeeze(sum(sum(powthr,1),2));
-  lgrp_i = findbiggest(x);
-  toi = gpow{cfg.intor.poweffect}.time(lgrp_i);
-  
-  %-------%
-  %-feedback
-  s_toi = sprintf('% 7.1f', toi);
-  s_toix = sprintf('% 5.f  ', x(lgrp_i));
-  %-------%
-  
-  x = squeeze(sum(sum(powthr,2),3));
-  label = gpow{cfg.intor.poweffect}.label(find(x));
-  
-  %-------%
-  %-feedback
-  s_l = sprintf('\t%s', label{:});
-  s_lx = sprintf('\t%1.f', x(x > 0));
-  %-------%
-  %-----------------%
-  
-  %-----------------%
-  %-convert into powpeak
-  powpeak(1).time = mean(toi);
-  powpeak(1).wndw = range(toi)/2;
-  powpeak(1).freq = mean(foi);
-  powpeak(1).band = range(foi);
-  powpeak(1).name = sprintf('thr_freq%02.fat%04.f', mean(foi), mean(toi)*1e3);
-  
-  save(cfg.intor.elec, 'label')
-  %-----------------%
-  
-  %-----------------%
-  %-output
-  output = sprintf('%speakdetected\n freq: %s\n    n: %s\n time: %s\n    n: %s\n elec: %s\n    n: %s\n', ...
-    output, s_foi, s_foix, s_toi, s_toix, s_l, s_lx);
-  
-  h = figure;
-  cfg1 = [];
-  cfg1.xlim = mean(toi) + [-.5 .5] * range(toi);
-  cfg1.ylim = mean(foi) + [-.5 .5] * range(foi);
-  cfg1.zlim = [0 cfg.intor.absthr * 1.5];
-  cfg1.highlight = 'yes';
-  cfg1.highlightchannel = label;
-  cfg1.layout = layout;
-  ft_topoplotTFR(cfg1, gpow{cfg.intor.poweffect});
-  
-  %--------%
-  %-save and link
-  pngname = sprintf('absthr_%1.f_freq%02.fat%04.f', cfg.intor.absthr, mean(foi), mean(toi)*1e3);
-  saveas(h, [cfg.log filesep pngname '.png'])
-  close(h); drawnow
-  
-  [~, logfile] = fileparts(cfg.log);
-  system(['ln ' cfg.log filesep pngname '.png ' cfg.rslt pngname '_' logfile '.png']);
-  %--------%
-  %-----------------%
-    
-end
-
+powpeak = cfg.intor.powpeak;
 save([cfg.dcor 'r_powpeak'], 'powpeak') % used by exportneckersd
 %---------------------------%
 
@@ -180,7 +85,7 @@ for k = 1:numel(cfg.intor.cond)
   cfg1.method = 'mtmconvol';
   cfg1.output = 'pow';
   cfg1.taper = 'hanning';
-  cfg1.foi = powpeak(f).freq + [-.5:.1:.5] * powpeak(f).band;
+  cfg1.foilim = powpeak(f).freq;
   
   cfg1.t_ftimwin = powpeak(f).wndw * ones(numel(cfg1.foi),1);
   cfg1.toi = powpeak(f).time;
