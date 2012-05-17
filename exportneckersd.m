@@ -8,7 +8,7 @@ output = 'LMER,';
 load([cfg.dcor 'r_powpeak'], 'powpeak')
 f = 1;
 output = [output sprintf('%s,%1.3f,%1.3f,%1.3f,%1.3f,', ...
-      powpeak(f).name, powpeak(f).time, powpeak(f).wndw, powpeak(f).freq, powpeak(f).band)];
+      powpeak(f).name, powpeak(f).time, powpeak(f).wndw, powpeak(f).freq(1), powpeak(f).freq(2))];
 %-----------------%
 
 %-----------------%

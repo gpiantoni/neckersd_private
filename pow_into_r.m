@@ -87,7 +87,9 @@ for k = 1:numel(cfg.intor.cond)
   cfg1.taper = 'hanning';
   cfg1.foilim = powpeak(f).freq;
   
-  cfg1.t_ftimwin = powpeak(f).wndw * ones(numel(cfg1.foi),1);
+  trldur = length(data.time{1})/data.fsample;
+  foi = powpeak(f).freq(1) : 1/trldur : powpeak(f).freq(2);
+  cfg1.t_ftimwin = powpeak(f).wndw * ones(numel(foi),1);
   cfg1.toi = powpeak(f).time;
   cfg1.feedback = 'none';
   cfg1.keeptrials = 'yes';
