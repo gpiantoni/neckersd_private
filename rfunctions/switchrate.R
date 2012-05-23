@@ -41,7 +41,8 @@ sr$durlog <- log(sr$dur)
 #-LMM for perceptual durations
 sink(output, append=TRUE)
 print('XXX Sleep Deprivation and Perceptual Duration XXX')
-lm1 <- lmer(durlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), sr)
+summary(subset(sr, dur > mindur & dur < maxdur))
+lm1 <- lmer(durlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(sr, dur > mindur & dur < maxdur))
 summary(lm1)
 #-----------------#
 

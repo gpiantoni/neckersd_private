@@ -14,16 +14,16 @@ datfile <- args[[1]]
 load(datfile)
 sink(args[[2]], append=TRUE)
 
-print('XXX Alpha Mediation of Sleep Deprivation and Perceptual Duration XXX')
+print('XXX Alpha Mediation of Sleep Deprivation and Perceptual duration XXX')
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
-dfp <- aggregate(cbind(dur, powlog, pow, day, sess) ~ subj + cond + trl, data = dfp, mean)
+dfp <- aggregate(cbind(durlog, powlog, pow, day) ~ subj + cond + trl + sess, data = dfp, mean) # average over electrodes
 
 #aggregate transforms them into numberic again
 dfp$day <- factor(dfp$day)
 dfp$sess <- ordered(dfp$sess)
 
-model1 <- lmer(dur ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
-model2 <- lmer(dur ~ cond + powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
+model1 <- lmer(durlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
+model2 <- lmer(durlog ~ cond + powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
 model3 <- lmer(powlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
 
 formula(model1)
@@ -52,7 +52,7 @@ print(r.3)
 print('a (s.e.)')
 print(se.3)
 
-print('b (ALPHA + cond -> dur)')
+print('b (ALPHA + cond -> durlog)')
 print(r.2b)
 print('a (s.e.)')
 print(se.2b)
