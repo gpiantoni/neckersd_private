@@ -79,13 +79,13 @@ for k = 1:numel(cfg.intor.cond)
     
     for t = 1:ntrl
       itrl = trl(t);
-      iseg = data.trialinfo(:,1) == itrl;
+      iseg = find(data.trialinfo(:,1) == itrl);
 
       for e = 1:size(pow,2);
         
         dat = sprintf('%s%03.f,%s,%1.f,%1.f,%1.f,%1f,%s,%1f,%1f,%1f\n', ....
           dat, ...
-          subj, condname{k}, subjday(subj, k), i, t, data.trialinfo(t, cfg.intor.info), ...
+          subj, condname{k}, subjday(subj, k), i, t, data.trialinfo(iseg(1), cfg.intor.info), ...
           data.label{e}, mean(pow(iseg, e)), mean(powlog(iseg, e)), mean(logpow(iseg, e)));
         
       end
