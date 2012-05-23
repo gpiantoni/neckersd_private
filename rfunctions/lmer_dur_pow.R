@@ -31,7 +31,7 @@ summary(dfp)
 #-----------------#
 
 #-----------------#
-print('XXX Power-durlogation Correlation (NS) XXX')
+print('XXX Power-duration Correlation (NS) XXX')
 lm1 <- lmer(durlog ~ powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns'))
 summary(lm1)
 est.ns.pow <- summary(lm1)@coefs[2,1]
@@ -39,13 +39,7 @@ t.ns.pow <- summary(lm1)@coefs[2,3]
 #-----------------#
 
 #-----------------#
-print('XXX Sleep Deprivation and Alpha Power (1) XXX')
-lm1 <- lmer(powlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
-summary(lm1)
-#-----------------#
-
-#-----------------#
-print('XXX Sleep Deprivation and Alpha Power (2) XXX')
+print('XXX Power-duration Correlation (SD) XXX')
 lm1 <- lmer(durlog ~ powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='sd'))
 summary(lm1)
 est.sd.pow <- summary(lm1)@coefs[2,1]
@@ -53,8 +47,14 @@ t.sd.pow <- summary(lm1)@coefs[2,3]
 #-----------------#
 
 #-----------------#
+print('XXX Sleep Deprivation and Alpha Power XXX')
+lm1 <- lmer(powlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
+summary(lm1)
+#-----------------#
+
+#-----------------#
 #-model
-print('XXX Sleep Deprivation and Alpha Power (3) XXX')
+print('XXX Full MODEL: Sleep Deprivation and Alpha Power XXX')
 lm1 <- lmer(durlog ~ powlog * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
 summary(lm1)
 sink()
