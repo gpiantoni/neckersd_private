@@ -1,7 +1,7 @@
-function [cond output] = event2trl_necker(cfg, event)
-%EVENT2TRL_NECKER create four types of trials based on stim and resp
+function [cond output] = event2trl_trial(cfg, event)
+%EVENT2TRL_TRIAL create four types of trials based on stim and resp
 % Use as:
-%   [cond output] = event2trl_gosdtrl(cfg, event)
+%   [cond output] = event2trl_trial(cfg, event)
 % where
 %   cfg is cfg.redef
 %   cfg.redef.trigger = 'switch'

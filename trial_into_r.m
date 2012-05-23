@@ -1,10 +1,10 @@
-function pow_into_r(cfg, subj)
-%POW_INTO_R convert power data into R
+function trial_into_r(cfg, subj)
+%TRIAL_INTO_R convert power data into R
 % only one time point and frequency
 
 %---------------------------%
 %-start log
-output = sprintf('(p%02.f) %s started at %s on %s\n', ...
+output = sprintf('(p%02.f) %s began at %s on %s\n', ...
   subj, mfilename,  datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'));
 tic_t = tic;
 %---------------------------%
