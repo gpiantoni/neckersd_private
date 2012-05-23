@@ -18,15 +18,15 @@ powns <- numeric(0)
 powsd <- numeric(0)
 
 for (e in levels(df$elec)){
-  lm1 <- lmer(dur ~ logpow * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, elec==e))
+  lm1 <- lmer(dur ~ powlog * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, elec==e))
   mainpow[e]  <- (summary(lm1))@coefs[2,3]
   maincond[e] <- (summary(lm1))@coefs[3,3]
   powcond[e]  <- (summary(lm1))@coefs[4,3]
   
-  lm1 <- lmer(dur ~ logpow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, elec==e & cond=='ns'))
+  lm1 <- lmer(dur ~ powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, elec==e & cond=='ns'))
   powns[e]  <- (summary(lm1))@coefs[2,3]
   
-  lm1 <- lmer(dur ~ logpow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, elec==e & cond=='sd'))
+  lm1 <- lmer(dur ~ powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, elec==e & cond=='sd'))
   powsd[e]  <- (summary(lm1))@coefs[2,3]
   
 }

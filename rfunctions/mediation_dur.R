@@ -16,15 +16,15 @@ sink(args[[2]], append=TRUE)
 
 print('XXX Alpha Mediation of Sleep Deprivation and Perceptual Duration XXX')
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
-dfp <- aggregate(cbind(dur, logpow, pow, day, sess) ~ subj + cond + trl, data = dfp, mean)
+dfp <- aggregate(cbind(dur, powlog, pow, day, sess) ~ subj + cond + trl, data = dfp, mean)
 
 #aggregate transforms them into numberic again
 dfp$day <- factor(dfp$day)
 dfp$sess <- ordered(dfp$sess)
 
 model1 <- lmer(dur ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
-model2 <- lmer(dur ~ cond + logpow + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
-model3 <- lmer(logpow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
+model2 <- lmer(dur ~ cond + powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
+model3 <- lmer(powlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
 
 formula(model1)
 print(summary(model1)@coefs)
