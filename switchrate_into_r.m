@@ -3,13 +3,13 @@ function switchrate_into_r(cfg, subj)
 
 %---------------------------%
 %-dir and files
-ddir = sprintf('%s%04.f/%s/%s/', cfg.data, subj, cfg.mod, cfg.cond); % data
+ddir = sprintf('%s%04.f/%s/%s/', cfg.data, subj, cfg.mod, cfg.nick); % data
 
 %-------%
 %-get cond names
-uniquecond = eq(cfg.test{1}, cfg.test{2});
-for i = 1:numel(cfg.test)
-  condname{i} = cfg.test{i}(~uniquecond);
+uniquecond = eq(cfg.switchrate.cond{1}, cfg.switchrate.cond{2});
+for i = 1:numel(cfg.switchrate.cond)
+  condname{i} = cfg.switchrate.cond{i}(~uniquecond);
 end
 %-------%
 %---------------------------%
@@ -31,11 +31,11 @@ subjday = [2 1 % EK
 getdur = @(x)[x(strcmp({x.type}, 'switch')).duration];
 dat = '';
 
-for k = 1:numel(cfg.test)
+for k = 1:numel(cfg.switchrate.cond)
   
   %-----------------%
   %-input and output for each condition
-  allfile = dir([ddir cfg.test{k} cfg.endname '.mat']); % files matching a preprocessing
+  allfile = dir([ddir cfg.switchrate.cond{k} cfg.endname '.mat']); % files matching a preprocessing
   %-----------------%
   
   %-----------------%
@@ -60,7 +60,7 @@ for k = 1:numel(cfg.test)
     
   else
     output = sprintf('%sCould not find any file in %s for test %s\n', ...
-      output, ddir, cfg.test{k});
+      output, ddir, cfg.switchrate.cond{k});
     
   end
   %-----------------%

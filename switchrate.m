@@ -3,7 +3,7 @@ function switchrate(cfg)
 
 %---------------------------%
 %-start log
-output = sprintf('%s started at %s on %s\n', ...
+output = sprintf('%s began at %s on %s\n', ...
   mfilename,  datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'));
 tic_t = tic;
 %---------------------------%
@@ -17,8 +17,8 @@ args{2} = sprintf('%03.f', cfg.switchrate.dur.min*10);
 args{3} = sprintf('%03.f', cfg.switchrate.dur.max*10);
 args{4} = sprintf('%03.f', cfg.switchrate.dur.steps*10);
 args{5} = sprintf('%03.f', cfg.switchrate.dur.bw*10);
-args{6} = sprintf('%sswitchrate_min%s_max%s_steps%s_bw%s.png', ...
-  cfg.rslt, args{2}, args{3}, args{4}, args{5}); % PDF?
+args{6} = sprintf('%s/switchrate_min%s_max%s_steps%s_bw%s.png', ...
+  cfg.log, args{2}, args{3}, args{4}, args{5}); % PDF?
 args{7} = [cfg.log '.txt'];
 
 s_args = sprintf(' %s', args{:});
