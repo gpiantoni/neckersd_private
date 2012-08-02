@@ -57,7 +57,7 @@ for subj = 1:numel(subjd)
   ldir = [origd subjd{subj} filesep];
   odir = sprintf('%s%04.f/%s/%s/', recs, subj, mod, 'orig'); % orig dir
   
-  mkdir(odir)
+  if ~isdir(odir); mkdir(odir); end
   
   trcfile = dir([ldir '*TRC']);
   allnecker = 0;
@@ -114,7 +114,7 @@ for subj = 1:numel(subjd)
   %-directory
   odir = sprintf('%s%04.f/%s/%s/', recs, subj, mod, 'orig'); % orig dir
   rdir = sprintf('%s%04.f/%s/%s/', recs, subj, mod, rawd); % raw dir
-  mkdir(rdir)
+  if ~isdir(rdir); mkdir(rdir); end
   %-----------------%
   
   %-----------------%
