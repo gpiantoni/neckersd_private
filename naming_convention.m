@@ -9,7 +9,19 @@ function naming_convention
 %
 % here we create a similar structure following the naming convention, with
 % orig and raw folders
+%
+% If you want to use two conditions, you need to be careful. There are 2
+% steps: 1. orange -> orig 2. orig -> raw
+% However, step 2. is not very smart, it just copy the data based on the
+% name, without reading the markers. So, you cannot run step 2. when the
+% folder orig contains data from both neckersd and resting (or any other
+% condition). So, run like this:
+% Run 1. and 2. for necker
+% delete data only in folder orig (the links in raw are now broken)
+% Run 1. and 2. for resting
+% Run 1. for only necker
 
+% 12/08/02 adapted for resting state as well
 % 12/02/01 created
 
 %-------------------------------------%
