@@ -20,7 +20,7 @@ origd = '/mnt/orange/romeijn/hdEEG fMRI Experiment/hdEEG data/';
 subjd = {'EK240708/PAT_12' 'HE030608/PAT_6' 'MS190708/PAT_11' 'MW200608/PAT_8' ...
   'NR090608/PAT_7' 'RW290508/PAT_4' 'TR280508/PAT_3' 'WM191008/PAT_13'};
 
-mkr = [102 103 104 105];
+mkr = [100 101]; % mkr = [102 103 104 105];
 
 subjcond = [2 1 % EK
 1 2 % HE
@@ -39,7 +39,7 @@ rec  = 'vigd';
 rawd = 'raw'; % name of the raw directory inside recordings
 
 mod  = 'eeg';
-cond = 'necker';
+cond = 'resting';
 
 base = ['/data1/projects/' proj filesep];
 recd = [base 'recordings/' rec filesep];
@@ -97,7 +97,7 @@ for subj = 1:numel(subjd)
   end
   %---------------------------%
 
-  fprintf('  % 2.f files with necker''s data', allnecker)
+  fprintf('  % 2.f files with %s data', allnecker, cond)
   if allnecker ~= 10
     fprintf(' <- NUMBER OF DATASET IS NOT 10!!!!');
   end
