@@ -3,30 +3,41 @@ function output = exportneckersd(cfg)
 
 output = 'LMER,';
 
-%-----------------%
-%-pow peak
-load([cfg.dcor 'r_powpeak'], 'powpeak')
-f = 1;
-output = [output sprintf('%s,%1.3f,%1.3f,%1.3f,%1.3f,', ...
-      powpeak(f).name, powpeak(f).time, powpeak(f).wndw, powpeak(f).freq(1), powpeak(f).freq(2))];
-%-----------------%
+%-------------------------------------%
+%-redef
+output = [output sprintf('%s,', cfg.redef.event2trl)];
+output = [output sprintf('%s,', cfg.redef.trigger)];
+output = [output sprintf('%f,', cfg.redef.mindist)];
+output = [output sprintf('%f,', cfg.redef.maxdist)];
 
-%-----------------%
-%-n electrodes
-if iscell(cfg.callr.selelec)
-  label = cfg.callr.selelec;
+if strcmp(cfg.redef.event2trl, 'event2trl_trial')
+  output = [output sprintf('%f,', cfg.redef.prestim)];
+  output = [output sprintf('%f,', cfg.redef.poststim)];
+  
 else
-  load(cfg.intor.elec, 'label')
+  output = [output sprintf('%f,', cfg.redef.pad)];
+  output = [output sprintf('%f,', cfg.redef.trldur)];
+  output = [output sprintf('%f,', cfg.redef.overlap)];
+  
 end
-nelec = numel(label);
-%-----------------%
+%-------------------------------------%
 
-%-----------------%
+%-------------------------------------%
+%-POW info
+output = [output sprintf('%f,', cfg.intor.powpeak.freq(1))];
+output = [output sprintf('%f,', cfg.intor.powpeak.freq(2))];
+%-------------------------------------%
+
+%-------------------------------------%
+%-stats
+output = [output sprintf('%f,', numel(cfg.callr.selelec))];
+%-------------------------------------%
+
+%-------------------------------------%
 %-read results
 extradata = [cfg.dcor 'dur_pow.csv'];
 lmerinfo = dlmread(extradata);
-s_lmer = sprintf('%1f,', lmerinfo);
-%-----------------%
+output = [output  sprintf('%f,', lmerinfo)];
 
 %-----------------%
 %-prepare output
@@ -37,16 +48,13 @@ s_lmer = sprintf('%1f,', lmerinfo);
 % 4- lmer powlog X cond: cond
 % 5- lmer powlog X cond: interaction
 % 6- lmer mediation
-output = [output sprintf('%1.f,%s', nelec, s_lmer)];
 %-----------------%
+%-------------------------------------%
 
-%-----------------%
+%-------------------------------------%
 %-clean up files
 delete(extradata)
-delete([extradata(1:end-3) 'Rdata'])
-delete([cfg.dcor 'r_powpeak.mat'])
+% delete([extradata(1:end-3) 'Rdata'])
+% delete([cfg.dcor 'r_powpeak.mat'])
 delete([cfg.dcor 'lmerelec*']);
-if isfield(cfg.intor, 'elec')
-  delete(cfg.intor.elec)
-end
-%-----------------%
+%-------------------------------------%
