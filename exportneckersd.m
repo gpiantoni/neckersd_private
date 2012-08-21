@@ -13,6 +13,8 @@ output = [output sprintf('%f,', cfg.redef.maxdist)];
 if strcmp(cfg.redef.event2trl, 'event2trl_trial')
   output = [output sprintf('%f,', cfg.redef.prestim)];
   output = [output sprintf('%f,', cfg.redef.poststim)];
+  output = [output sprintf('%f,', cfg.intor.powpeak(1).time)];
+  output = [output sprintf('%f,', cfg.intor.powpeak(1).wndw)];
   
 else
   output = [output sprintf('%f,', cfg.redef.pad)];
