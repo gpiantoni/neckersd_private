@@ -21,7 +21,9 @@ function naming_convention
 % Run 1. and 2. for resting
 % Run 1. for only necker
 
-% 12/08/02 adapted for resting state as well
+% 12/08/02 adapted for resting state as well. Not completely, there are
+%          some missing markers and problems. I'm using the cleaned-up data
+%          for the moment
 % 12/02/01 created
 
 %-------------------------------------%
@@ -32,7 +34,7 @@ origd = '/mnt/orange/romeijn/hdEEG fMRI Experiment/hdEEG data/';
 subjd = {'EK240708/PAT_12' 'HE030608/PAT_6' 'MS190708/PAT_11' 'MW200608/PAT_8' ...
   'NR090608/PAT_7' 'RW290508/PAT_4' 'TR280508/PAT_3' 'WM191008/PAT_13'};
 
-mkr = [100 101]; % mkr = [102 103 104 105];
+mkr = [102 103 104 105]; % mkr = [100 101];
 
 subjcond = [2 1 % EK
 1 2 % HE
@@ -51,7 +53,7 @@ rec  = 'vigd';
 rawd = 'raw'; % name of the raw directory inside recordings
 
 mod  = 'eeg';
-cond = 'resting';
+cond = 'necker'; % cond = 'resting';
 
 base = ['/data1/projects/' proj filesep];
 recd = [base 'recordings/' rec filesep];
