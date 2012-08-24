@@ -4,8 +4,8 @@ function between_into_r(cfg, subj)
 
 %---------------------------%
 %-start log
-output = sprintf('(p%02.f) %s started at %s on %s\n', ...
-  subj, mfilename,  datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'));
+output = sprintf('%s (%04d) began at %s on %s\n', ...
+  mfilename, subj, datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'));
 tic_t = tic;
 %---------------------------%
 
@@ -106,8 +106,8 @@ fclose(fid);
 %---------------------------%
 %-end log
 toc_t = toc(tic_t);
-outtmp = sprintf('(p%02.f) %s ended at %s on %s after %s\n\n', ...
-  subj, mfilename, datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'), ...
+outtmp = sprintf('%s (%04d) ended at %s on %s after %s\n\n', ...
+  mfilename, subj, datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'), ...
   datestr( datenum(0, 0, 0, 0, 0, toc_t), 'HH:MM:SS'));
 output = [output outtmp];
 
@@ -118,19 +118,3 @@ fwrite(fid, output);
 fclose(fid);
 %-----------------%
 %---------------------------%
-
-%-------------------------------------%
-%-subfunction FINDBIGGEST
-function lgrp_i = findbiggest(x)
-i_x = find(x > 0);
-
-i_bnd = find(diff(i_x) ~= 1);
-bnd = [1 i_bnd+1; i_bnd numel(i_x)]';
-
-for i = 1:size(bnd,1)
-  grp(i) = sum(x(i_x(bnd(i,1)):i_x(bnd(i,2))));
-end
-
-[~, lgrp] = max(grp);
-lgrp_i = i_x(bnd(lgrp,1)):(i_x(bnd(lgrp,2)));
-%-------------------------------------%
