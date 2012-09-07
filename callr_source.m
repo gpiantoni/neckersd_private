@@ -12,18 +12,6 @@ tic_t = tic;
 %---------------------------%
 %-common
 rdir = [cfg.scrp cfg.proj '_private/rfunctions/'];
-
-%-----------------%
-%-elec for specific analysis
-if iscell(cfg.callr.selelec)
-  label = cfg.callr.selelec;
-else
-  load(cfg.intor.elec, 'label')
-end
-
-s_elec = sprintf('''%s'',', label{:});
-selelec = ['c(' s_elec(1:end-1) ')']; 
-%-----------------%
 %---------------------------%
 
 %---------------------------%
@@ -31,22 +19,18 @@ selelec = ['c(' s_elec(1:end-1) ')'];
 funname = [rdir 'lmer_elec.R'];
 args = [Rdata ' ' elecbase];
 system(['Rscript ' funname ' ' args]);
-eff = {'mainpow' 'maincond' 'powcond' 'powns' 'powsd'};
-
-for i = 1:numel(eff)
-  h = figure;  
-  plottvalue(eff{i}, layout, elecbase)
+h = figure;  
+plottvalue(eff{i}, layout, elecbase)
   
-  %--------%
-  %-save and link
-  pngname = sprintf('lmer_topo_%s', eff{i} );
-  saveas(h, [cfg.log filesep pngname '.png'])
-  close(h); drawnow
+%--------%
+%-save and link
+pngname = sprintf('lmer_topo_%s', eff{i} );
+saveas(h, [cfg.log filesep pngname '.png'])
+close(h); drawnow
   
-  [~, logfile] = fileparts(cfg.log);
-  system(['ln ' cfg.log filesep pngname '.png ' cfg.rslt pngname '_' logfile '.png']);
-  %--------%
-end
+[~, logfile] = fileparts(cfg.log);
+system(['ln ' cfg.log filesep pngname '.png ' cfg.rslt pngname '_' logfile '.png']);
+%--------%
 %---------------------------%
 
 

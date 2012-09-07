@@ -70,13 +70,13 @@ for k = 1:numel(cfg.soucorr.cond) % XXX cond can also be the 5 session
   tmpcfg.dics.keepfilter = 'yes';
   tmpcfg.dics.feedback = 'none';
   
-  tmpcfg.dics.lambda = '10%';
+  tmpcfg.dics.lambda = 0; % or 10%, should not make a difference
   
   tmpcfg.vol = vol;
   tmpcfg.grid = leadchan;
   tmpcfg.elec = sens;
   
-  if haslambda && ~isfield(cfg.soucorr, 'noise') && ~isempty(cfg.soucorr.noise)
+  if haslambda && isfield(cfg.soucorr, 'noise') && cfg.soucorr.noise
     tmpcfg.projectnoise = 'yes';
   end
   
@@ -93,7 +93,7 @@ for k = 1:numel(cfg.soucorr.cond) % XXX cond can also be the 5 session
 
   %---------------------------%
   %-use noise if necessary
-  if haslambda && ~isfield(cfg.soucorr, 'noise') && cfg.soucorr.noise
+  if haslambda && isfield(cfg.soucorr, 'noise') && cfg.soucorr.noise
     noise = cat(1, soucorr.trial.noise);
     pow = pow ./ noise; % definition of NAI
   end
@@ -117,11 +117,14 @@ for k = 1:numel(cfg.soucorr.cond) % XXX cond can also be the 5 session
     
     for e = 1:size(pow,2);
       
-      text2write = sprintf('%03d,%s,%d,%d,%f,%d,%f\n', ....
-        subj, condname, k, t, data.trialinfo(iseg(1), cfg.soucorr.info), ...
-        e, mean(pow(iseg, e))); % mean over the segments
-
-      fprintf(fid, text2write);
+      if ~any(isnan(pow(iseg, e)))
+        text2write = sprintf('%03d,%s,%d,%d,%f,%d,%f\n', ....
+          subj, condname, k, t, data.trialinfo(iseg(1), cfg.soucorr.info), ...
+          e, mean(pow(iseg, e))); % mean over the segments
+        
+        fprintf(fid, text2write);
+      end
+      
     end
   end
   %---------------------------%
