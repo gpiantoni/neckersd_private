@@ -36,35 +36,35 @@ args = [cfg.intor.csv ' ' Rdata];
 system(['Rscript ' funname ' ' args]);
 %---------------------------%
 
-%---------------------------%
-% 2. lmer on each electrodes and plot
-funname = [rdir 'lmer_elec.R'];
-args = [Rdata ' ' elecbase];
-system(['Rscript ' funname ' ' args]);
-eff = {'mainpow' 'maincond' 'powcond' 'powns' 'powsd'};
-
-for i = 1:numel(eff)
-  h = figure;  
-  plottvalue(eff{i}, layout, elecbase)
-  
-  %--------%
-  %-save and link
-  pngname = sprintf('lmer_topo_%s', eff{i} );
-  saveas(h, [cfg.log filesep pngname '.png'])
-  close(h); drawnow
-  
-  [~, logfile] = fileparts(cfg.log);
-  system(['ln ' cfg.log filesep pngname '.png ' cfg.rslt pngname '_' logfile '.png']);
-  %--------%
-end
-%---------------------------%
+% %---------------------------%
+% % 2. lmer on each electrodes and plot
+% funname = [rdir 'lmer_elec.R'];
+% args = [Rdata ' ' elecbase];
+% system(['Rscript ' funname ' ' args]);
+% eff = {'mainpow' 'maincond' 'powcond' 'powns' 'powsd'};
+% 
+% for i = 1:numel(eff)
+%   h = figure;  
+%   plottvalue(eff{i}, layout, elecbase)
+%   
+%   %--------%
+%   %-save and link
+%   pngname = sprintf('lmer_topo_%s', eff{i} );
+%   saveas(h, [cfg.log filesep pngname '.png'])
+%   close(h); drawnow
+%   
+%   [~, logfile] = fileparts(cfg.log);
+%   system(['ln ' cfg.log filesep pngname '.png ' cfg.rslt pngname '_' logfile '.png']);
+%   %--------%
+% end
+% %---------------------------%
 
 %---------------------------%
 % 3. lmer_dur_pow
 funname = [rdir 'lmer_dur_pow.R'];
 
 pngname = 'lmer_fitted';
-args = [Rdata ' ' cfg.log '.txt "' selelec '" ' [cfg.log filesep pngname '.png']];
+args = [Rdata ' ' cfg.log '.txt "' selelec '" ' cfg.callr.sess ' ' [cfg.log filesep pngname '.png']];
 system(['Rscript ' funname ' ' args ]);
 
 %--------%
@@ -78,7 +78,7 @@ system(['ln ' cfg.log filesep pngname '.png ' cfg.rslt pngname '_' logfile '.png
 % 4. mediation_dur
 funname = [rdir 'mediation_dur.R'];
 
-args = [Rdata ' ' cfg.log '.txt "' selelec '"'];
+args = [Rdata ' ' cfg.log '.txt "' selelec '" ' cfg.callr.sess];
 system(['Rscript ' funname ' ' args ]);
 %---------------------------%
 

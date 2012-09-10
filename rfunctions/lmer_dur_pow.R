@@ -21,7 +21,12 @@ datfile <- args[[1]]
 load(datfile)
 sink(args[[2]], append=TRUE)
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
-dfp <- aggregate(cbind(durlog, powlog, pow, day) ~ subj + cond + trl + sess, data = dfp, mean) # average over electrodes
+if (args[[4]] == 'sess') {
+  dfp <- aggregate(cbind(durlog, powlog, pow, day) ~ subj + cond + trl + sess, data = dfp, mean) # average over electrodes
+} else {
+  dfp <- aggregate(cbind(durlog, powlog, pow, day, sess) ~ subj + cond + trl, data = dfp, mean) # average over electrodes
+}
+
 
 #aggregate transforms them into numberic again
 dfp$day <- factor(dfp$day)
@@ -78,7 +83,7 @@ write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
 
 #-----------------#
 #-plot
-png(filename=args[[4]])
+png(filename=args[[5]])
 dfp$durlogfit <- fitted(lm1)
 q <- ggplot(dfp, aes(x=powlog, y=durlogfit, color=cond))
 q + geom_point() + facet_grid(subj ~ .)

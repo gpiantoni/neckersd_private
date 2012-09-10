@@ -16,7 +16,12 @@ sink(args[[2]], append=TRUE)
 
 print('XXX Alpha Mediation of Sleep Deprivation and Perceptual duration XXX')
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
-dfp <- aggregate(cbind(durlog, powlog, pow, day) ~ subj + cond + trl + sess, data = dfp, mean) # average over electrodes
+
+if (args[[4]] == 'sess') {
+  dfp <- aggregate(cbind(durlog, powlog, pow, day) ~ subj + cond + trl + sess, data = dfp, mean) # average over electrodes
+} else {
+  dfp <- aggregate(cbind(durlog, powlog, pow, day, sess) ~ subj + cond + trl, data = dfp, mean) # average over electrodes
+}
 
 #aggregate transforms them into numberic again
 dfp$day <- factor(dfp$day)
