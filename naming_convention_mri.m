@@ -56,7 +56,7 @@ end
 
 %-------------------------------------%
 %-convert into simpler format
-for subj = 2:numel(subjd)
+for subj = 1:numel(subjd)
   
   cdir = sprintf('%s%04.f/%s/%s/', recs, subj, mod, 'conv'); % conv dir
   cname = sprintf('%s_%04.f_%s_%s', rec, subj, mod, cond);

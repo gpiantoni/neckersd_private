@@ -40,7 +40,7 @@ source.pow(C{1}) = C{2};
 %-interpolate
 mri = ft_read_mri([cfg.anly 'smri/neckersd_vigd_avg_smri_t1_spm.nii.gz']);
 tmpcfg = [];
-tmpcfg.parameter = {'pow' 'mask'};
+tmpcfg.parameter = {'pow'};
 source = ft_sourceinterpolate(tmpcfg, source, mri);
 %---------------------------%
 
