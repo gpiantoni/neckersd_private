@@ -18,7 +18,7 @@ function [cond output] = event2trl_inbetween(cfg, event)
 %   output is a text for output
 %
 % Part of NECKERSD_PRIVATE
-% see also EVENT2TRL_NECKER
+% see also EVENT2TRL_NECKER, EVENT2TRL_BOTH
 
 %-----------------%
 %-create trl where there is a switch
@@ -62,6 +62,6 @@ cond(1).trialinfo = info(enoughdist,:);
 
 %-----------------%
 %-output
-output = sprintf('   n events:% 3.f (total switch:% 3d at mindist% 4.2fs, maxdist% 4.2fs)\n', ...
+output = sprintf('   n events:% 4d (total switch:% 4d at mindist% 4.2fs, maxdist% 4.2fs)\n', ...
   numel(find(enoughdist)), numel(mrk), min(cond(1).trialinfo(:,2)), max(cond(1).trialinfo(:,2)));
 %-----------------%
