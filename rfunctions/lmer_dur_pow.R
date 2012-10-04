@@ -1,32 +1,38 @@
-#LMER_durlog_POW: 
+#LMER_dur_POW: 
 
 #-----------------#
 #-pass arguments
 #1. file of the dataset
-#2. output file
+#2. 'pow' 'powlog' 'logpow'
 #3. electrode list
-#4. name of pngfile
+#4. 'sess' or 'nosess'
+#5. output file
 args <- commandArgs(TRUE)
 #-----------------#
+
+print(args[[2]])
 
 #-----------------#
 #-library
 library('lme4')
-library('ggplot2')
 #-----------------#
 
 #-----------------#
 #-data
 datfile <- args[[1]]
 load(datfile)
-sink(args[[2]], append=TRUE)
+
+# get rid of confusing columns
+df$alphapow <- df[,args[[2]]]
+df <- df[,!(names(df) %in% c('pow', 'powlog', 'logpow'))]
+
+sink(args[[5]], append=TRUE)
 dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
 if (args[[4]] == 'sess') {
-  dfp <- aggregate(cbind(durlog, powlog, pow, day) ~ subj + cond + trl + sess, data = dfp, mean) # average over electrodes
+  dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess, data = dfp, mean) # average over electrodes
 } else {
-  dfp <- aggregate(cbind(durlog, powlog, pow, day, sess) ~ subj + cond + trl, data = dfp, mean) # average over electrodes
+  dfp <- aggregate(cbind(alphapow, dur, day, sess) ~ subj + cond + trl, data = dfp, mean) # average over electrodes
 }
-
 
 #aggregate transforms them into numberic again
 dfp$day <- factor(dfp$day)
@@ -37,7 +43,7 @@ summary(dfp)
 
 #-----------------#
 print('XXX Power-duration Correlation (NS) XXX')
-lm1 <- lmer(durlog ~ powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns'))
+lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns'))
 summary(lm1)
 est.ns.pow <- summary(lm1)@coefs[2,1]
 t.ns.pow <- summary(lm1)@coefs[2,3]
@@ -45,7 +51,7 @@ t.ns.pow <- summary(lm1)@coefs[2,3]
 
 #-----------------#
 print('XXX Power-duration Correlation (SD) XXX')
-lm1 <- lmer(durlog ~ powlog + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='sd'))
+lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='sd'))
 summary(lm1)
 est.sd.pow <- summary(lm1)@coefs[2,1]
 t.sd.pow <- summary(lm1)@coefs[2,3]
@@ -53,14 +59,14 @@ t.sd.pow <- summary(lm1)@coefs[2,3]
 
 #-----------------#
 print('XXX Sleep Deprivation and Alpha Power XXX')
-lm1 <- lmer(powlog ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
+lm1 <- lmer(alphapow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
 summary(lm1)
 #-----------------#
 
 #-----------------#
 #-model
 print('XXX Full MODEL: Sleep Deprivation and Alpha Power XXX')
-lm1 <- lmer(durlog ~ powlog * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
+lm1 <- lmer(dur ~ alphapow * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
 summary(lm1)
 sink()
 #-----------------#
@@ -79,13 +85,4 @@ tocsv <- c(t.ns.pow, t.sd.pow, t.pow, t.cond, t.int)
 
 infofile <- paste(substr(datfile, 1, nchar(datfile)-6), 'csv', sep='.')
 write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
-#-----------------#
-
-#-----------------#
-#-plot
-png(filename=args[[5]])
-dfp$durlogfit <- fitted(lm1)
-q <- ggplot(dfp, aes(x=powlog, y=durlogfit, color=cond))
-q + geom_point() + facet_grid(subj ~ .)
-dev.off()
 #-----------------#

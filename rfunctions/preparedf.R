@@ -16,7 +16,6 @@ df$subj <- factor(df$subj)
 df$trl <- factor(df$trl)
 df$day <- factor(df$day)
 df$sess <- ordered(df$sess)
-df$durlog <- log(df$dur)
 
 save(df, file=args[[2]])
 #-----------------#
