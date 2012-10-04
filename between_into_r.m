@@ -1,6 +1,15 @@
-function between_into_r(cfg, subj)
+function between_into_r(info, opt, subj)
 %BETWEEN_INTO_R convert power data into R, using inbetween data
 % only one time point and frequency
+%
+% INFO
+%  .log
+%
+% CFG.OPT
+%  .cond
+%  .freq: two scalars for frequency limit
+%  .powcorr: which column from trialinfo
+%  .trl_index: use true or false trial index
 
 %---------------------------%
 %-start log
@@ -9,28 +18,11 @@ output = sprintf('%s (%04d) began at %s on %s\n', ...
 tic_t = tic;
 %---------------------------%
 
-%---------------------------%
-%-dir and files
-ddir = sprintf('%s%04.f/%s/%s/', cfg.data, subj, cfg.mod, cfg.nick); % data
-load(cfg.sens.layout, 'layout')
-
-%-------%
-%-get cond names
-uniquecond = eq(cfg.intor.cond{1}, cfg.intor.cond{2});
-for i = 1:numel(cfg.intor.cond)
-  condname{i} = cfg.intor.cond{i}(~uniquecond);
-end
-%-------%
-%---------------------------%
-
-%---------------------------%
-%-use predefined power-peaks for areas of interest
-powpeak = cfg.intor.powpeak;
-save([cfg.dcor 'r_powpeak'], 'powpeak') % used by exportneckersd
-%---------------------------%
-
 %-------------------------------------%
 %-loop over conditions
+
+if ~isfield(opt, 'trl_index'); opt.trl_index = true; end
+
 %-----------------%
 %-assign day, based on subj number and condition
 subjday = [2 1 % EK
@@ -41,31 +33,43 @@ subjday = [2 1 % EK
   2 1 % RW
   1 2 % TR
   2 1]; % WM
+
+%-------%
+%-get cond names
+uniquecond = eq(opt.cond{1}, opt.cond{2});
+for i = 1:numel(opt.cond)
+  condname{i} = opt.cond{i}(~uniquecond);
+end
+
+csvname = regexprep(opt.cond{1}(uniquecond), '*', '');
+%-------%
 %-----------------%
 
-f = 1; % only first powpeak
-
+%-------------------------------------%
+%-loop over conditions
 dat = '';
-for k = 1:numel(cfg.intor.cond)
+
+for k = 1:numel(opt.cond)
   
-  %-----------------%
-  %-input and output for each condition
-  allfile = dir([ddir cfg.intor.cond{k} cfg.endname '.mat']); % files matching a preprocessing
-  if isempty(allfile)
-    continue
-  end
-  %-----------------%
-  
-  %-----------------%
-  %-loop over session
-  for i = 1:numel(allfile)
-    load([ddir allfile(i).name], 'data')
+  for i = 1:5
     
+    %---------------------------%
+    %-read data
+    cond2read = regexprep(opt.cond{k}, '*', sprintf('_%03d', i));
+    [data] = load_data(info, subj, cond2read);
+    if isempty(data)
+      output = sprintf('%sCould not find any file for condition %s\n', ...
+        output, cond2read);
+      continue
+    end
+    %---------------------------%
+    
+    %---------------------------%
     cfg1 = [];
     cfg1.method = 'mtmfft';
     cfg1.output = 'pow';
     cfg1.taper = 'hanning';
-    cfg1.foilim = powpeak(f).freq;
+    cfg1.foilim = opt.freq;
     cfg1.feedback = 'none';
     cfg1.keeptrials = 'yes';
     freq = ft_freqanalysis(cfg1, data);
@@ -81,7 +85,7 @@ for k = 1:numel(cfg.intor.cond)
       itrl = trl(t);
       iseg = find(data.trialinfo(:,1) == itrl);
       
-      if cfg.intor.trl_index
+      if opt.trl_index
         idur = iseg(1);
       else
         idur = t;
@@ -91,20 +95,20 @@ for k = 1:numel(cfg.intor.cond)
         
         dat = sprintf('%s%03.f,%s,%1.f,%1.f,%1.f,%1f,%s,%1f,%1f,%1f\n', ....
           dat, ...
-          subj, condname{k}, subjday(subj, k), i, t, data.trialinfo(idur, cfg.intor.info), ...
+          subj, condname{k}, subjday(subj, k), i, t, data.trialinfo(idur, opt.powcorr), ...
           data.label{e}, mean(pow(iseg, e)), mean(powlog(iseg, e)), mean(logpow(iseg, e)));
         
       end
     end
-
+    %---------------------------%
   end
-  %-----------------%
+  
 end
 %-------------------------------------%
 
 %-------------------------------------%
 %-write to file
-fid = fopen(cfg.intor.csv, 'a+');
+fid = fopen([info.dcor csvname '.csv'], 'a+');
 fprintf(fid, dat);
 fclose(fid);
 %-------------------------------------%
@@ -119,7 +123,7 @@ output = [output outtmp];
 
 %-----------------%
 fprintf(output)
-fid = fopen([cfg.log '.txt'], 'a');
+fid = fopen([info.log '.txt'], 'a');
 fwrite(fid, output);
 fclose(fid);
 %-----------------%

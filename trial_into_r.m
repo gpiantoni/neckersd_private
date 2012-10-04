@@ -1,32 +1,24 @@
-function trial_into_r(cfg, subj)
+function trial_into_r(info, opt, subj)
 %TRIAL_INTO_R convert power data into R
-% only one time point and frequency
+% only frequency, but maybe more points?
+% 
+% INFO
+%  .log
+% 
+% CFG.OPT
+%  .cond
+%  .freq: two scalars for frequency limit
+%  .time: time of interest 
+%  .wndw: length of time window
+%  .powcorr: which column from trialinfo
+
+error('to be tested with time')
 
 %---------------------------%
 %-start log
-output = sprintf('(p%02.f) %s began at %s on %s\n', ...
-  subj, mfilename,  datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'));
+output = sprintf('%s (%04d) began at %s on %s\n', ...
+  mfilename, subj, datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'));
 tic_t = tic;
-%---------------------------%
-
-%---------------------------%
-%-dir and files
-ddir = sprintf('%s%04.f/%s/%s/', cfg.data, subj, cfg.mod, cfg.nick); % data
-load(cfg.sens.layout, 'layout')
-
-%-------%
-%-get cond names
-uniquecond = eq(cfg.intor.cond{1}, cfg.intor.cond{2});
-for i = 1:numel(cfg.intor.cond)
-  condname{i} = cfg.intor.cond{i}(~uniquecond);
-end
-%-------%
-%---------------------------%
-
-%---------------------------%
-%-use predefined or power-peaks for areas of interest
-powpeak = cfg.intor.powpeak;
-save([cfg.dcor 'r_powpeak'], 'powpeak') % used by exportneckersd
 %---------------------------%
 
 %-------------------------------------%
@@ -41,56 +33,48 @@ subjday = [2 1 % EK
   2 1 % RW
   1 2 % TR
   2 1]; % WM
+
+%-------%
+%-get cond names
+uniquecond = eq(opt.cond{1}, opt.cond{2});
+for i = 1:numel(opt.cond)
+  condname{i} = opt.cond{i}(~uniquecond);
+end
+%-------%
 %-----------------%
 
-f = 1; % only first powpeak
-
 dat = '';
-for k = 1:numel(cfg.intor.cond)
+%-------------------------------------%
+%-loop over conditions
+for k = 1:numel(opt.cond)
   
-  %-----------------%
-  %-input and output for each condition
-  allfile = dir([ddir cfg.intor.cond{k} cfg.endname '.mat']); % files matching a preprocessing
-  if isempty(allfile)
+  %---------------------------%
+  %-condition to read
+  cond = opt.cond{k};
+  %---------------------------%
+  
+  %---------------------------%
+  %-read data
+  [data] = load_data(info, subj, cond);
+  if isempty(data)
+    output = sprintf('%sCould not find any file for condition %s\n', ...
+      output, cond);
     continue
   end
-  %-----------------%
+  %---------------------------%
   
-  %-----------------%
-  %-concatenate only if you have more datasets
-  if numel(allfile) > 1
-    spcell = @(name) sprintf('%s%s', ddir, name);
-    allname = cellfun(spcell, {allfile.name}, 'uni', 0);
-
-    dataall = [];
-    for i = 1:numel(allname)
-      load(allname{i}, 'data')
-      data.trialinfo = [data.trialinfo repmat(i, numel(data.trial), 1)];
-      dataall{i} = data;
-    end
-    
-    cfg1 = [];
-    data = ft_appenddata(cfg1, dataall{:});
-    clear dataall
-    
-  else
-    load([ddir allfile(1).name], 'data')
-    
-  end
-  %-----------------%
-  
-  %-----------------%
+  %---------------------------%
   %-pow on peak
   cfg1 = [];
   cfg1.method = 'mtmconvol';
   cfg1.output = 'pow';
   cfg1.taper = 'hanning';
-  cfg1.foilim = powpeak(f).freq;
+  cfg1.foilim = opt.freq;
   
   trldur = length(data.time{1})/data.fsample;
-  foi = powpeak(f).freq(1) : 1/trldur : powpeak(f).freq(2);
-  cfg1.t_ftimwin = powpeak(f).wndw * ones(numel(foi),1);
-  cfg1.toi = powpeak(f).time;
+  foi = opt.freq(1) : 1/trldur : opt.freq(2);
+  cfg1.t_ftimwin = opt.wndw * ones(numel(foi),1);
+  cfg1.toi = opt.time;
   cfg1.feedback = 'none';
   cfg1.keeptrials = 'yes';
   freq = ft_freqanalysis(cfg1, data);
@@ -98,26 +82,26 @@ for k = 1:numel(cfg.intor.cond)
   pow = mean(freq.powspctrm,3);
   powlog = mean(log(freq.powspctrm),3);
   logpow = log(mean(freq.powspctrm,3));
-  %-----------------%
+  %---------------------------%
   
-  %-----------------%
+  %---------------------------%
   %-write to file
   for t = 1:size(pow,1);
     for e = 1:size(pow,2);
       dat = sprintf('%s%03.f,%s,%1.f,%1.f,%1.f,%1f,%s,%1f,%1f,%1f\n', ....
         dat, ...
-        subj, condname{k}, subjday(subj, k), data.trialinfo(t, end), t, data.trialinfo(t, cfg.intor.info), ...
+        subj, condname, subjday(subj, k_nssd), data.trialinfo(t, end), t, data.trialinfo(t, opt.powcorr), ...
         data.label{e}, pow(t,e), powlog(t,e), logpow(t,e));
     end
   end
-  %-----------------%
+  %---------------------------%
   
 end
 %-------------------------------------%
 
 %-------------------------------------%
 %-write to file
-fid = fopen(cfg.intor.csv, 'a+');
+fid = fopen(opt.csv, 'a+');
 fprintf(fid, dat);
 fclose(fid);
 %-------------------------------------%
@@ -125,31 +109,15 @@ fclose(fid);
 %---------------------------%
 %-end log
 toc_t = toc(tic_t);
-outtmp = sprintf('(p%02.f) %s ended at %s on %s after %s\n\n', ...
-  subj, mfilename, datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'), ...
+outtmp = sprintf('%s (%04d) ended at %s on %s after %s\n\n', ...
+  mfilename, subj, datestr(now, 'HH:MM:SS'), datestr(now, 'dd-mmm-yy'), ...
   datestr( datenum(0, 0, 0, 0, 0, toc_t), 'HH:MM:SS'));
 output = [output outtmp];
 
 %-----------------%
 fprintf(output)
-fid = fopen([cfg.log '.txt'], 'a');
+fid = fopen([info.log '.txt'], 'a');
 fwrite(fid, output);
 fclose(fid);
 %-----------------%
 %---------------------------%
-
-%-------------------------------------%
-%-subfunction FINDBIGGEST
-function lgrp_i = findbiggest(x)
-i_x = find(x > 0);
-
-i_bnd = find(diff(i_x) ~= 1);
-bnd = [1 i_bnd+1; i_bnd numel(i_x)]';
-
-for i = 1:size(bnd,1)
-  grp(i) = sum(x(i_x(bnd(i,1)):i_x(bnd(i,2))));
-end
-
-[~, lgrp] = max(grp);
-lgrp_i = i_x(bnd(lgrp,1)):(i_x(bnd(lgrp,2)));
-%-------------------------------------%
