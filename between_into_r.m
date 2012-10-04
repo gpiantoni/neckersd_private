@@ -65,14 +65,14 @@ for k = 1:numel(opt.cond)
     %---------------------------%
     
     %---------------------------%
-    cfg1 = [];
-    cfg1.method = 'mtmfft';
-    cfg1.output = 'pow';
-    cfg1.taper = 'hanning';
-    cfg1.foilim = opt.freq;
-    cfg1.feedback = 'none';
-    cfg1.keeptrials = 'yes';
-    freq = ft_freqanalysis(cfg1, data);
+    cfg = [];
+    cfg.method = 'mtmfft';
+    cfg.output = 'pow';
+    cfg.taper = 'hanning';
+    cfg.foilim = opt.freq;
+    cfg.feedback = 'none';
+    cfg.keeptrials = 'yes';
+    freq = ft_freqanalysis(cfg, data);
     
     pow = mean(freq.powspctrm,3);
     powlog = mean(log(freq.powspctrm),3);

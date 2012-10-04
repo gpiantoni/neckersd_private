@@ -1,18 +1,16 @@
-function trial_into_r(info, opt, subj)
-%TRIAL_INTO_R convert power data into R
+function switch_into_r(info, opt, subj)
+%SWITCH_INTO_R convert power data into R
 % only frequency, but maybe more points?
-% 
+%
 % INFO
 %  .log
-% 
+%
 % CFG.OPT
 %  .cond
 %  .freq: two scalars for frequency limit
-%  .time: time of interest 
+%  .time: time of interest
 %  .wndw: length of time window
 %  .powcorr: which column from trialinfo
-
-error('to be tested with time')
 
 %---------------------------%
 %-start log
@@ -23,6 +21,9 @@ tic_t = tic;
 
 %-------------------------------------%
 %-loop over conditions
+
+if ~isfield(opt, 'trl_index'); opt.trl_index = true; end
+
 %-----------------%
 %-assign day, based on subj number and condition
 subjday = [2 1 % EK
@@ -40,68 +41,82 @@ uniquecond = eq(opt.cond{1}, opt.cond{2});
 for i = 1:numel(opt.cond)
   condname{i} = opt.cond{i}(~uniquecond);
 end
+
+csvname = regexprep(opt.cond{1}(uniquecond), '*', '');
 %-------%
 %-----------------%
 
-dat = '';
 %-------------------------------------%
 %-loop over conditions
+dat = '';
+
 for k = 1:numel(opt.cond)
   
-  %---------------------------%
-  %-condition to read
-  cond = opt.cond{k};
-  %---------------------------%
-  
-  %---------------------------%
-  %-read data
-  [data] = load_data(info, subj, cond);
-  if isempty(data)
-    output = sprintf('%sCould not find any file for condition %s\n', ...
-      output, cond);
-    continue
-  end
-  %---------------------------%
-  
-  %---------------------------%
-  %-pow on peak
-  cfg1 = [];
-  cfg1.method = 'mtmconvol';
-  cfg1.output = 'pow';
-  cfg1.taper = 'hanning';
-  cfg1.foilim = opt.freq;
-  
-  trldur = length(data.time{1})/data.fsample;
-  foi = opt.freq(1) : 1/trldur : opt.freq(2);
-  cfg1.t_ftimwin = opt.wndw * ones(numel(foi),1);
-  cfg1.toi = opt.time;
-  cfg1.feedback = 'none';
-  cfg1.keeptrials = 'yes';
-  freq = ft_freqanalysis(cfg1, data);
-  
-  pow = mean(freq.powspctrm,3);
-  powlog = mean(log(freq.powspctrm),3);
-  logpow = log(mean(freq.powspctrm,3));
-  %---------------------------%
-  
-  %---------------------------%
-  %-write to file
-  for t = 1:size(pow,1);
-    for e = 1:size(pow,2);
-      dat = sprintf('%s%03.f,%s,%1.f,%1.f,%1.f,%1f,%s,%1f,%1f,%1f\n', ....
-        dat, ...
-        subj, condname, subjday(subj, k_nssd), data.trialinfo(t, end), t, data.trialinfo(t, opt.powcorr), ...
-        data.label{e}, pow(t,e), powlog(t,e), logpow(t,e));
+  for i = 1:5
+    
+    %---------------------------%
+    %-read data
+    cond2read = regexprep(opt.cond{k}, '*', sprintf('_%03d', i));
+    [data] = load_data(info, subj, cond2read);
+    if isempty(data)
+      output = sprintf('%sCould not find any file for condition %s\n', ...
+        output, cond2read);
+      continue
     end
+    %---------------------------%
+    
+    %---------------------------%
+    %-pow on peak
+    cfg = [];
+    cfg.method = 'mtmconvol';
+    cfg.output = 'pow';
+    cfg.taper = 'hanning';
+    cfg.foilim = opt.freq;
+    
+    trldur = length(data.time{1})/data.fsample;
+    foi = opt.freq(1) : 1/trldur : opt.freq(2);
+    cfg.t_ftimwin = opt.wndw * ones(numel(foi),1);
+    cfg.toi = opt.time;
+    
+    cfg.feedback = 'none';
+    cfg.keeptrials = 'yes';
+    freq = ft_freqanalysis(cfg, data);
+    
+    pow = mean(freq.powspctrm,3);
+    powlog = mean(log(freq.powspctrm),3);
+    logpow = log(mean(freq.powspctrm,3));
+    
+    trl = unique(freq.trialinfo(:,1));
+    ntrl = numel(trl);
+    
+    for t = 1:ntrl
+      itrl = trl(t);
+      iseg = find(data.trialinfo(:,1) == itrl);
+      
+      if opt.trl_index
+        idur = iseg(1);
+      else
+        idur = t;
+      end
+      
+      for e = 1:size(pow,2);
+        
+        dat = sprintf('%s%03.f,%s,%1.f,%1.f,%1.f,%1f,%s,%1f,%1f,%1f\n', ....
+          dat, ...
+          subj, condname{k}, subjday(subj, k), i, t, data.trialinfo(idur, opt.powcorr), ...
+          data.label{e}, mean(pow(iseg, e)), mean(powlog(iseg, e)), mean(logpow(iseg, e)));
+        
+      end
+    end
+    %---------------------------%
   end
-  %---------------------------%
   
 end
 %-------------------------------------%
 
 %-------------------------------------%
 %-write to file
-fid = fopen(opt.csv, 'a+');
+fid = fopen([info.dcor csvname '.csv'], 'a+');
 fprintf(fid, dat);
 fclose(fid);
 %-------------------------------------%
