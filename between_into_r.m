@@ -70,13 +70,16 @@ for k = 1:numel(opt.cond)
     cfg.output = 'pow';
     cfg.taper = 'hanning';
     cfg.foilim = opt.freq;
+    cfg.channel = opt.channel;
     cfg.feedback = 'none';
     cfg.keeptrials = 'yes';
     freq = ft_freqanalysis(cfg, data);
     
-    pow = mean(freq.powspctrm,3);
-    powlog = mean(log(freq.powspctrm),3);
-    logpow = log(mean(freq.powspctrm,3));
+    pow  =     mean(mean(freq.powspctrm,3),2);
+    pow1 = log(mean(mean(freq.powspctrm,3),2));
+    pow2 = mean(log(mean(freq.powspctrm,2)),3);
+    pow3 = mean(log(mean(freq.powspctrm,3)),2);
+    pow4 = mean(mean(log(freq.powspctrm),3),2);
     
     trl = unique(freq.trialinfo(:,1));
     ntrl = numel(trl);
@@ -91,16 +94,16 @@ for k = 1:numel(opt.cond)
         idur = t;
       end
       
-      for e = 1:size(pow,2);
-        
-        dat = sprintf('%s%03.f,%s,%1.f,%1.f,%1.f,%1f,%s,%1f,%1f,%1f\n', ....
-          dat, ...
-          subj, condname{k}, subjday(subj, k), i, t, data.trialinfo(idur, opt.powcorr), ...
-          data.label{e}, mean(pow(iseg, e)), mean(powlog(iseg, e)), mean(logpow(iseg, e)));
-        
-      end
+      dat = sprintf(['%s', ...
+        '%03d,%s,%d,%d,%d,%1f,%1.3f,' ...
+        '%1f,%1f,%1f,%1f,%1f\n'], ....
+        dat, ...
+        subj, condname{k}, subjday(subj, k), i, t, data.trialinfo(idur, opt.powcorr), 0, ...
+        mean(pow(iseg,:)), mean(pow1(iseg,:)), mean(pow2(iseg,:)), mean(pow3(iseg,:)), mean(pow4(iseg,:)));
+      
     end
     %---------------------------%
+    
   end
   
 end

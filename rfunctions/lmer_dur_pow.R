@@ -3,14 +3,11 @@
 #-----------------#
 #-pass arguments
 #1. file of the dataset
-#2. 'pow' 'powlog' 'logpow'
-#3. electrode list
-#4. 'sess' or 'nosess'
-#5. output file
+#2. 'pow', 'pow1', 'pow2', 'pow3', 'pow4'
+#3. 'sess' or 'nosess'
+#4. output file
 args <- commandArgs(TRUE)
 #-----------------#
-
-print(args[[2]])
 
 #-----------------#
 #-library
@@ -21,17 +18,17 @@ library('lme4')
 #-data
 datfile <- args[[1]]
 load(datfile)
+outputfile <- args[[4]]
 
 # get rid of confusing columns
 df$alphapow <- df[,args[[2]]]
-df <- df[,!(names(df) %in% c('pow', 'powlog', 'logpow'))]
+df <- df[,!(names(df) %in% c('pow', 'pow1', 'pow2', 'pow3', 'pow4'))]
 
-sink(args[[5]], append=TRUE)
-dfp <- subset(df, elec %in% eval(parse(text=args[[3]])))
-if (args[[4]] == 'sess') {
-  dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess, data = dfp, mean) # average over electrodes
+sink(outputfile, append=TRUE)
+if (args[[3]] == 'sess') {
+  dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess, data = df, mean) # average over electrodes
 } else {
-  dfp <- aggregate(cbind(alphapow, dur, day, sess) ~ subj + cond + trl, data = dfp, mean) # average over electrodes
+  dfp <- aggregate(cbind(alphapow, dur, day, sess) ~ subj + cond + trl, data = df, mean) # average over electrodes
 }
 
 #aggregate transforms them into numberic again
@@ -83,6 +80,6 @@ est.int <- summary(lm1)@coefs[4,1]
 t.int <- summary(lm1)@coefs[4,3]
 tocsv <- c(t.ns.pow, t.sd.pow, t.pow, t.cond, t.int)
 
-infofile <- paste(substr(datfile, 1, nchar(datfile)-6), 'csv', sep='.')
+infofile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'output_predict', '.csv', sep='')
 write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
 #-----------------#
