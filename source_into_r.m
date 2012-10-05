@@ -70,7 +70,7 @@ for k = 1:numel(opt.cond)
 
   %---------------------------%
   %-source analysis (all trials)
-  haslambda = isfield(opt.dics, 'lambda') && ~isempty(opt.dics.lambda) && opt.dics.lambda ~= 0;
+  haslambda = isfield(opt.dics, 'lambda') && ~isempty(opt.dics.lambda);
   
   tmpcfg = [];
   
