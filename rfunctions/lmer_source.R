@@ -8,7 +8,7 @@ args <- commandArgs(TRUE)
 
 #-----------------#
 #-read the data
-filenames <- list.files(path = args[[1]], pattern = 'soucorr_', full.names=TRUE)
+filenames <- list.files(path = args[[1]], pattern = 'source_', full.names=TRUE)
 df <- do.call("rbind", lapply(filenames, read.csv, header = FALSE)) 
 
 colnames(df) <- c('subj', 'cond', 'sess', 'trl', 'dur', 'pos', 'pow')

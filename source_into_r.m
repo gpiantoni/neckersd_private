@@ -1,7 +1,19 @@
-function source_into_r(cfg, subj)
+function source_into_r(info, opt, subj)
 %SOURCE_INTO_R calculate power at the source level and use it for
 %correlation
 % only one time point and frequency
+%
+% INFO
+%  .log
+% 
+% CFG.OPT
+%  .freq: center frequency
+%  .tapsmofrq: smoothing 
+%  .dics: options for dics, such as
+%    .lambda
+%  .noise: compute noise
+%  .log: take log
+%  .powcorr: which column from trialinfo
 %
 % TODO: use a baseline condition
 
@@ -12,27 +24,26 @@ output = sprintf('%s (%04d) began at %s on %s\n', ...
 tic_t = tic;
 %---------------------------%
 
-[vol, lead, sens] = load_headshape(cfg, subj);
+[vol, lead, sens] = load_headshape(info, subj);
 
 %-------------------------------------%
 %-loop over conditions
-fid = fopen(sprintf('%s%04d.csv', cfg.soucorr.csv, subj), 'w+');
+maincond = 'ns';
 
-for k = 1:numel(cfg.soucorr.cond) % XXX cond can also be the 5 session
+fid = fopen(sprintf('%ssource_%04d.csv', info.dcor, subj), 'w+');
+
+for k = 1:numel(opt.cond) 
   
-  cond     = cfg.soucorr.cond{k};
-  condname = regexprep(cond, '*', '');
+  cond = opt.cond{k};
   
   %---------------------------%
   %-read data
-  [data badchan] = load_data(cfg, subj, cond);
+  [data badchan] = load_data(info, subj, cond);
   if isempty(data)
     output = sprintf('%sCould not find any file for condition %s\n', ...
       output, cond);
     continue
   end
-  
-  outputfile = sprintf('soucorr_%04d_%s', subj, condname);
   %---------------------------%
   
   %---------------------------%
@@ -48,8 +59,8 @@ for k = 1:numel(cfg.soucorr.cond) % XXX cond can also be the 5 session
   tmpcfg.output = 'fourier';
  
   tmpcfg.taper = 'dpss';
-  tmpcfg.foi = cfg.soucorr.freq;
-  tmpcfg.tapsmofrq = cfg.soucorr.tapsmofrq;
+  tmpcfg.foi = opt.freq;
+  tmpcfg.tapsmofrq = opt.tapsmofrq;
   
   tmpcfg.feedback = 'none';
   tmpcfg.channel = datachan;
@@ -59,24 +70,23 @@ for k = 1:numel(cfg.soucorr.cond) % XXX cond can also be the 5 session
 
   %---------------------------%
   %-source analysis (all trials)
-  haslambda = isfield(cfg.soucorr.dics, 'lambda') && ~isempty(cfg.soucorr.dics.lambda);
+  haslambda = isfield(opt.dics, 'lambda') && ~isempty(opt.dics.lambda) && opt.dics.lambda ~= 0;
   
   tmpcfg = [];
   
-  tmpcfg.frequency = cfg.soucorr.freq;
+  tmpcfg.frequency = opt.freq;
   
   tmpcfg.method = 'dics';
-  tmpcfg.dics = cfg.soucorr.dics;
+  tmpcfg.dics = opt.dics;
+  
   tmpcfg.dics.keepfilter = 'yes';
   tmpcfg.dics.feedback = 'none';
-  
-  tmpcfg.dics.lambda = 0; % or 10%, should not make a difference
   
   tmpcfg.vol = vol;
   tmpcfg.grid = leadchan;
   tmpcfg.elec = sens;
   
-  if haslambda && isfield(cfg.soucorr, 'noise') && cfg.soucorr.noise
+  if haslambda && isfield(opt, 'noise') && opt.noise
     tmpcfg.projectnoise = 'yes';
   end
   
@@ -93,7 +103,7 @@ for k = 1:numel(cfg.soucorr.cond) % XXX cond can also be the 5 session
 
   %---------------------------%
   %-use noise if necessary
-  if haslambda && isfield(cfg.soucorr, 'noise') && cfg.soucorr.noise
+  if haslambda && isfield(opt, 'noise') && opt.noise
     noise = cat(1, soucorr.trial.noise);
     pow = pow ./ noise; % definition of NAI
   end
@@ -101,7 +111,7 @@ for k = 1:numel(cfg.soucorr.cond) % XXX cond can also be the 5 session
   
   %---------------------------%
   %-log
-  if ~isfield(cfg.soucorr, 'log') && cfg.soucorr.log
+  if ~isfield(opt, 'log') && opt.log
     pow = log(pow);
   end
   %---------------------------%
@@ -119,7 +129,7 @@ for k = 1:numel(cfg.soucorr.cond) % XXX cond can also be the 5 session
       
       if ~any(isnan(pow(iseg, e)))
         text2write = sprintf('%03d,%s,%d,%d,%f,%d,%f\n', ....
-          subj, condname, k, t, data.trialinfo(iseg(1), cfg.soucorr.info), ...
+          subj, maincond, k, t, data.trialinfo(iseg(1), opt.powcorr), ...
           e, mean(pow(iseg, e))); % mean over the segments
         
         fprintf(fid, text2write);
@@ -145,7 +155,7 @@ output = [output outtmp];
 
 %-----------------%
 fprintf(output)
-fid = fopen([cfg.log '.txt'], 'a');
+fid = fopen([info.log '.txt'], 'a');
 fwrite(fid, output);
 fclose(fid);
 %-----------------%

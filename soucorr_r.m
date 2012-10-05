@@ -1,4 +1,4 @@
-function soucorr_r(cfg)
+function soucorr_r(info, opt)
 %SOUCORR_R correlation of the source in R
 % 
 
@@ -11,22 +11,22 @@ tic_t = tic;
 
 %---------------------------%
 % correlation for each source point
-rdir = [cfg.scrp cfg.proj '_private/rfunctions/'];
+rdir = [info.scrp info.nick '_private/rfunctions/'];
 funname = [rdir 'lmer_source.R'];
-args = [cfg.dcor];
+args = [info.dcor];
 system(['Rscript ' funname ' ' args]);
 %---------------------------%
 
 %---------------------------%
 %-read data
-fid = fopen([cfg.dcor 'soucorr.csv'], 'r');
+fid = fopen([info.dcor 'soucorr.csv'], 'r');
 C = textscan(fid, '%n %n');
 fclose(fid);
 %---------------------------%
 
 %---------------------------%
 %-create source
-load(cfg.vol.template, 'lead')
+load(info.vol.template, 'lead')
 source = [];
 source.pos = lead.pos;
 source.inside = lead.inside;
@@ -38,7 +38,7 @@ source.pow(C{1}) = C{2};
 
 %---------------------------%
 %-interpolate
-mri = ft_read_mri([cfg.anly 'smri/neckersd_vigd_avg_smri_t1_spm.nii.gz']);
+mri = ft_read_mri([info.anly 'smri/neckersd_vigd_avg_smri_t1_spm.nii.gz']);
 tmpcfg = [];
 tmpcfg.parameter = {'pow'};
 source = ft_sourceinterpolate(tmpcfg, source, mri);
@@ -54,11 +54,11 @@ ft_sourceplot(tmpcfg, source);
 %--------%
 %-save and link
 pngname = 'lmer_source';
-saveas(gcf, [cfg.log filesep pngname '.png'])
+saveas(gcf, [info.log filesep pngname '.png'])
 close(gcf); drawnow
 
-[~, logfile] = fileparts(cfg.log);
-system(['ln ' cfg.log filesep pngname '.png ' cfg.rslt pngname '_' logfile '.png']);
+[~, logfile] = fileparts(info.log);
+system(['ln ' info.log filesep pngname '.png ' info.rslt pngname '_' logfile '.png']);
 %--------%
 %---------------------------%
 
@@ -72,7 +72,7 @@ output = [output outtmp];
 
 %-----------------%
 fprintf(output)
-fid = fopen([cfg.log '.txt'], 'a');
+fid = fopen([info.log '.txt'], 'a');
 fwrite(fid, output);
 fclose(fid);
 %-----------------%
