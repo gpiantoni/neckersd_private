@@ -25,6 +25,8 @@ df$alphapow <- df[,args[[2]]]
 df <- df[,!(names(df) %in% c('pow', 'pow1', 'pow2', 'pow3', 'pow4'))]
 
 sink(outputfile, append=TRUE)
+cat('\n\n\nLMER_DUR_POW\n\n')
+
 if (args[[3]] == 'sess') {
   dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess, data = df, mean) # average over electrodes
 } else {
@@ -80,6 +82,6 @@ est.int <- summary(lm1)@coefs[4,1]
 t.int <- summary(lm1)@coefs[4,3]
 tocsv <- c(t.ns.pow, t.sd.pow, t.pow, t.cond, t.int)
 
-infofile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'output_predict', '.csv', sep='')
+infofile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'output_main', '.csv', sep='')
 write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
 #-----------------#

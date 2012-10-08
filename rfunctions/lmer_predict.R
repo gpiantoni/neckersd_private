@@ -25,6 +25,8 @@ df$alphapow <- df[,args[[2]]]
 df <- df[,!(names(df) %in% c('pow', 'pow1', 'pow2', 'pow3', 'pow4'))]
 
 sink(outputfile, append=TRUE)
+cat('\n\n\nLMER_PREDICT\n\n')
+
 if (args[[3]] == 'sess') {
   dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess + time, data = df, mean) # average over electrodes
 } else {
