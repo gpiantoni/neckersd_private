@@ -42,7 +42,7 @@ summary(dfp)
 #-----------------#
 
 #-----------------#
-tstat <- 0
+tstat <- numeric(length(levels(dfp$time)))
 cnt <- 0
 for (t in levels(dfp$time)){
   lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns' & time==t))
@@ -55,8 +55,18 @@ print(tstat, digits=2)
 #-----------------#
 
 #-----------------#
+#-to csv
+tocsv <- NULL
+tocsv[1] <- max(tstat)
+tocsv[2] <- levels(dfp$time)[which.max(tstat)]
+tocsv[3] <- sum(tstat > 1.95)
+tocsv[4] <- sum(tstat > 1.64)
+#-----------------#
+
+#-----------------#
 sink()
 
 infofile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'output_predict', '.csv', sep='')
-write.table(tstat, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
+write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
+#-----------------#
 #-----------------#
