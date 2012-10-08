@@ -111,7 +111,7 @@ for k = 1:numel(opt.cond)
   
   %---------------------------%
   %-log
-  if ~isfield(opt, 'log') && opt.log
+  if isfield(opt, 'log') && opt.log
     pow = log(pow);
   end
   %---------------------------%
