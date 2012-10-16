@@ -66,27 +66,27 @@ for k = 1:numel(opt.cond)
     %---------------------------%
     
     %---------------------------%
-    cfg = [];
-    cfg.method = 'mtmconvol';
-    cfg.output = 'pow';
-    cfg.taper = 'hanning';
-    cfg.foilim = opt.freq;
+    powspctrm = zeros(numel(data.trial), numel(opt.channel), 1, numel(opt.time));
     
-    trldur = length(data.time{1})/data.fsample;
-    foi = opt.freq(1) : 1/trldur : opt.freq(2);
-    cfg.t_ftimwin = opt.wndw * ones(numel(foi),1);
-    cfg.toi = opt.time;
+    for t = 1:numel(opt.time)
+      datasel = ft_selectdata(data, 'toilim', opt.wndw * [-.5 .5] + opt.time(t));
+      cfg = [];
+      cfg.method = 'mtmfft';
+      cfg.output = 'pow';
+      cfg.taper = 'hanning';
+      cfg.foilim = opt.freq;
+      cfg.channel = opt.channel;
+      cfg.feedback = 'none';
+      cfg.keeptrials = 'yes';
+      freq = ft_freqanalysis(cfg, datasel);
+      powspctrm(:,:,1,t) = freq.powspctrm;
+    end
     
-    cfg.channel = opt.channel;
-    cfg.feedback = 'none';
-    cfg.keeptrials = 'yes';
-    freq = ft_freqanalysis(cfg, data);
-    
-    pow  = permute(    mean(mean(freq.powspctrm,3),2) , [1 4 2 3]);
-    pow1 = permute(log(mean(mean(freq.powspctrm,3),2)), [1 4 2 3]);
-    pow2 = permute(mean(log(mean(freq.powspctrm,2)),3), [1 4 2 3]);
-    pow3 = permute(mean(log(mean(freq.powspctrm,3)),2), [1 4 2 3]);
-    pow4 = permute(mean(mean(log(freq.powspctrm),3),2), [1 4 2 3]);
+    pow  = permute(    mean(mean(powspctrm,3),2) , [1 4 2 3]);
+    pow1 = permute(log(mean(mean(powspctrm,3),2)), [1 4 2 3]);
+    pow2 = permute(mean(log(mean(powspctrm,2)),3), [1 4 2 3]);
+    pow3 = permute(mean(log(mean(powspctrm,3)),2), [1 4 2 3]);
+    pow4 = permute(mean(mean(log(powspctrm),3),2), [1 4 2 3]);
     
     trl = unique(freq.trialinfo(:,1));
     ntrl = numel(trl);
