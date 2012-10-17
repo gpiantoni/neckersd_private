@@ -36,7 +36,7 @@ d_dfp <- aggregate(cbind(alphapow, dur) ~ subj, data = dfp, diff);
 (t2 <- t.test(d_dfp$dur))
 
 (t3 <- cor.test(d_dfp$alphapow, d_dfp$dur))
-#-----------------#
+#-----------------#% 
 
 #-----------------#
 #-prepare csv
