@@ -66,10 +66,22 @@ for k = 1:numel(opt.cond)
     %---------------------------%
     
     %---------------------------%
-    powspctrm = zeros(numel(data.trial), numel(opt.channel), 1, numel(opt.time));
+    %-----------------%
+    %-compute number of frequency (not elegant, but use freqanalysis).
+    datasel = ft_selectdata(data, 'toilim', opt.wndw * [-.499 .5] + opt.time(1));
+    cfg = [];
+    cfg.method = 'mtmfft';
+    cfg.taper = 'hanning';
+    cfg.foilim = opt.freq;
+    cfg.channel = opt.channel;
+    cfg.feedback = 'none';
+    freq = ft_freqanalysis(cfg, datasel);
+    %-----------------%
+    
+    powspctrm = zeros(numel(data.trial), numel(opt.channel), numel(freq.freq), numel(opt.time));
     
     for t = 1:numel(opt.time)
-      datasel = ft_selectdata(data, 'toilim', opt.wndw * [-.5 .5] + opt.time(t));
+      datasel = ft_selectdata(data, 'toilim', opt.wndw * [-.499 .5] + opt.time(t));
       cfg = [];
       cfg.method = 'mtmfft';
       cfg.output = 'pow';
@@ -79,7 +91,7 @@ for k = 1:numel(opt.cond)
       cfg.feedback = 'none';
       cfg.keeptrials = 'yes';
       freq = ft_freqanalysis(cfg, datasel);
-      powspctrm(:,:,1,t) = freq.powspctrm;
+      powspctrm(:,:,:,t) = freq.powspctrm;
     end
     
     pow  = permute(    mean(mean(powspctrm,3),2) , [1 4 2 3]);
