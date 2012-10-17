@@ -77,7 +77,7 @@ print(se.3)
 
 print('b (ALPHA + cond -> durlog)')
 print(r.2b)
-print('a (s.e.)')
+print('b (s.e.)')
 print(se.2b)
 
 print('c prime')
