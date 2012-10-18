@@ -4,8 +4,7 @@
 #-pass arguments
 #1. file of the dataset
 #2. 'pow', 'pow1', 'pow2', 'pow3', 'pow4'
-#3. 'sess' or 'nosess'
-#4. output file
+#3. output file
 args <- commandArgs(TRUE)
 #-----------------#
 
@@ -17,7 +16,7 @@ library('lme4')
 #-----------------#
 #-data
 datfile <- args[[1]]
-outputfile <- args[[4]]
+outputfile <- args[[3]]
 load(datfile)
 
 # get rid of confusing columns
@@ -27,11 +26,7 @@ df <- df[,!(names(df) %in% c('pow', 'pow1', 'pow2', 'pow3', 'pow4'))]
 sink(outputfile, append=TRUE)
 cat('\n\n\nLMER_PREDICT\n\n')
 
-if (args[[3]] == 'sess') {
-  dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess + time, data = df, mean) # average over electrodes
-} else {
-  dfp <- aggregate(cbind(alphapow, dur, day, sess) ~ subj + cond + trl + time, data = df, mean) # average over electrodes
-}
+dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess + time, data = df, mean) # average over electrodes
 
 #aggregate transforms them into numberic again
 dfp$day <- factor(dfp$day)
