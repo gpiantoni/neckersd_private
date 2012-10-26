@@ -13,7 +13,10 @@ end
 
 %-------------------------------------%
 %-from cfg to log
-output = [output struct2log(cfg, 'csv')];
+output = [output sprintf('%d,', cfg(9).opt.freq(1), cfg(9).opt.freq(2))];
+output = [output sprintf('%d,', numel(cfg(9).opt.channel))];
+output = [output cfg(11).opt.rfun(2).args{2}]; % pow
+output = [output sprintf('%f,', cfg(10).opt.wndw)];
 %-------------------------------------%
 
 %-------------------------------------%
