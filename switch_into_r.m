@@ -67,21 +67,25 @@ for k = 1:numel(opt.cond)
     
     %---------------------------%
     %-----------------%
-    %-compute number of frequency (not elegant, but use freqanalysis).
-    datasel = ft_selectdata(data, 'toilim', opt.wndw * [-.499 .5] + opt.time(1));
-    cfg = [];
-    cfg.method = 'mtmfft';
-    cfg.taper = 'hanning';
-    cfg.foilim = opt.freq;
-    cfg.channel = opt.channel;
-    cfg.feedback = 'none';
-    freq = ft_freqanalysis(cfg, datasel);
+    %-compute number of frequency
+    nfreq = ceil(diff(opt.freq) * opt.wndw) + 1;
     %-----------------%
     
-    powspctrm = zeros(numel(data.trial), numel(opt.channel), numel(freq.freq), numel(opt.time));
+    powspctrm = zeros(numel(data.trial), numel(opt.channel), nfreq, numel(opt.time));
     
     for t = 1:numel(opt.time)
-      datasel = ft_selectdata(data, 'toilim', opt.wndw * [-.499 .5] + opt.time(t));
+      
+      %-----------------%
+      %-select data in time window
+      datasel = data;
+      sel1 = nearest(data.time{1}, opt.time(t) - opt.wndw / 2);
+      sel2 = sel1 + round(opt.wndw * data.fsample) - 1;
+      for tr = 1:numel(data.time)
+        datasel.time{tr} = datasel.time{tr}(:,sel1:sel2);
+        datasel.trial{tr} = datasel.trial{tr}(:,sel1:sel2);
+      end
+      %-----------------%
+      
       cfg = [];
       cfg.method = 'mtmfft';
       cfg.output = 'pow';
