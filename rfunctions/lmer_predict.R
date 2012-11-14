@@ -56,12 +56,18 @@ tocsv[1] <- max(tstat)
 tocsv[2] <- levels(dfp$time)[which.max(tstat)]
 tocsv[3] <- sum(tstat > 1.95)
 tocsv[4] <- sum(tstat > 1.64)
+
+lm_t <- lm(1:length(tstat) ~ tstat)
+tocsv[5] <- lm_t$coefficients[[2]]
 #-----------------#
 
 #-----------------#
 sink()
 
 infofile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'output_predict', '.csv', sep='')
+write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
+
+predictfile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'predict_values', '.csv', sep='')
 write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
 #-----------------#
 #-----------------#

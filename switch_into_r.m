@@ -57,6 +57,7 @@ for k = 1:numel(opt.cond)
     %---------------------------%
     %-read data
     cond2read = regexprep(opt.cond{k}, '*', sprintf('_%03d', i));
+    disp(cond2read)
     [data] = load_data(info, subj, cond2read);
     if isempty(data)
       output = sprintf('%sCould not find any file for condition %s\n', ...
@@ -71,7 +72,7 @@ for k = 1:numel(opt.cond)
     nfreq = ceil(diff(opt.freq) * opt.wndw) + 1;
     %-----------------%
     
-    powspctrm = zeros(numel(data.trial), numel(opt.channel), nfreq, numel(opt.time));
+    powspctrm = [];%zeros(numel(data.trial), numel(opt.channel), nfreq, numel(opt.time));
     
     for t = 1:numel(opt.time)
       
@@ -95,7 +96,7 @@ for k = 1:numel(opt.cond)
       cfg.feedback = 'none';
       cfg.keeptrials = 'yes';
       freq = ft_freqanalysis(cfg, datasel);
-      powspctrm(:,:,:,t) = freq.powspctrm;
+      powspctrm = cat(4, powspctrm, freq.powspctrm);
     end
     
     pow  = permute(    mean(mean(powspctrm,3),2) , [1 4 2 3]);
