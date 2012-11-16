@@ -32,6 +32,6 @@ for (e in levels(df$pos)){
 
 #-----------------#
 #-write to file
-csvpos <- paste(args[[1]], 'soucorr.csv', sep='')
+csvpos <- paste(args[[2]], 'soucorr.csv', sep='')
 write.table(powcorr, file=csvpos, col.names=FALSE, quote=FALSE)
 #-----------------#

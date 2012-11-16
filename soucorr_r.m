@@ -13,13 +13,13 @@ tic_t = tic;
 % correlation for each source point
 rdir = [info.scrp info.nick '_private/rfunctions/'];
 funname = [rdir 'lmer_source.R'];
-args = [info.dcor];
+args = [info.dcor ' ' info.log filesep];
 system(['Rscript ' funname ' ' args]);
 %---------------------------%
 
 %---------------------------%
 %-read data
-fid = fopen([info.dcor 'soucorr.csv'], 'r');
+fid = fopen([info.log filesep 'soucorr.csv'], 'r');
 C = textscan(fid, '%n %n');
 fclose(fid);
 %---------------------------%

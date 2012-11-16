@@ -68,6 +68,6 @@ infofile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'output_predict',
 write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
 
 predictfile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'predict_values', '.csv', sep='')
-write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
+write.table(tstat, file=predictfile, row.names=FALSE, col.names=FALSE, quote=FALSE)
 #-----------------#
 #-----------------#
