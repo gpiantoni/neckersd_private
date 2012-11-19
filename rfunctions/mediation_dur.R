@@ -75,9 +75,9 @@ print(r.2b)
 print('b (s.e.)')
 print(se.2b)
 
-print('c prime')
+print('ab')
 print(indir)
-print('c prime (s.e.)')
+print('ab (s.e.)')
 print(serr)
 
 print('c')
