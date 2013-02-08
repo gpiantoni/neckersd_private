@@ -8,7 +8,7 @@ function between_into_r(info, opt, subj)
 % CFG.OPT
 %  .cond
 %  .freq: two scalars for frequency limit
-%  .powcorr: which column from trialinfo
+%  .infocol: which column from trialinfo
 %  .trl_index: use true or false trial index
 
 %---------------------------%
@@ -98,7 +98,7 @@ for k = 1:numel(opt.cond)
         '%03d,%s,%d,%d,%d,%1f,%1.3f,' ...
         '%1f,%1f,%1f,%1f,%1f\n'], ....
         dat, ...
-        subj, condname{k}, subjday(subj, k), i, t, data.trialinfo(idur, opt.powcorr), 0, ...
+        subj, condname{k}, subjday(subj, k), i, t, data.trialinfo(idur, opt.infocol), 0, ...
         mean(pow(iseg,:)), mean(pow1(iseg,:)), mean(pow2(iseg,:)), mean(pow3(iseg,:)), mean(pow4(iseg,:)));
       
     end
