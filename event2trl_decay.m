@@ -1,7 +1,7 @@
 function [cond output] = event2trl_decay(cfg, event)
-%EVENT2TRL_INBETWEEN create trials for welch's analysis 
+%EVENT2TRL_DECAY create trials and count starting from the end
 % Use as:
-%   [cond output] = event2trl_inbetween(cfg, event)
+%   [cond output] = event2trl_decay(cfg, event)
 % where
 %   cfg is cfg.redef
 %   cfg.redef.trigger = 'switch';
@@ -12,13 +12,13 @@ function [cond output] = event2trl_decay(cfg, event)
 %   cfg.redef.overlap = 0.5; % percentage of overlap between trials
 % 
 %   cond is a struct with
-%     .name = 'between'
+%     .name = 'decay'
 %     .trl = [begsmp endsmp offset];
 %     .trialinfo = extra_trialinfo (optional)
 %   output is a text for output
 %
 % Part of NECKERSD_PRIVATE
-% see also EVENT2TRL_NECKER, EVENT2TRL_BOTH
+% see also EVENT2TRL_INBETWEEN, EVENT2TRL_SWITCH
 
 %-----------------%
 %-create trl where there is a switch
