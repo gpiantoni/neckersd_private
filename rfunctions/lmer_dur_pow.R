@@ -41,6 +41,13 @@ lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset
 summary(lm1)
 est.ns.pow <- summary(lm1)@coefs[2,1]
 t.ns.pow <- summary(lm1)@coefs[2,3]
+
+r2.corr.mer <- function(m) {
+  lmfit <-  lm(model.response(m@frame) ~ fitted(m))
+  summary(lmfit)$r.squared
+}
+cat('\nR-squared\n')
+print(r2.corr.mer(lm1))
 #-----------------#
 
 #-----------------#
@@ -80,3 +87,13 @@ tocsv <- c(t.ns.pow, t.sd.pow, t.pow, t.cond, t.int)
 infofile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'output_main', '.csv', sep='')
 write.table(tocsv, file=infofile, row.names=FALSE, col.names=FALSE, quote=FALSE)
 #-----------------#
+
+
+#-ALPHA SCATTER LINE PLOT
+# 12/11/27
+# dfp <- aggregate(cbind(alphapow) ~ subj + cond + sess, data = df, mean) # average over electrodes
+# dfp1 <- dfp[!rownames(dfp) %in% '71',] # remove unmatched observation
+# dfp1$subjsess  <- interaction(dfp1$subj, dfp1$sess)
+
+# p <- ggplot(dfp1, aes(x=cond, y=alphapow, color=factor(subj)))
+# p + geom_point() + geom_line(aes(group=subjsess))
