@@ -70,36 +70,6 @@ cond(1).trialinfo = info(enoughdist,:);
 %-----------------%
 
 %-----------------%
-%-assign a decreasing number starting from the last position
-decay_time = zeros(size(cond(1).trialinfo,1),1);
-t = cfg.pad + cfg.overlap * cfg.trldur;
-for i_t = size(cond(1).trialinfo,1):-1:1
-  decay_time(i_t,1) = t;
-  
-  if i_t == 1
-    
-    if cond(1).trialinfo(i_t,1) == cond(1).trialinfo(i_t+1,1) % only exception to avoid out of index error
-      t = t + cfg.overlap * cfg.trldur;
-    else
-      t = cfg.pad + cfg.overlap * cfg.trldur;
-    end
-    
-  else
-    
-    if cond(1).trialinfo(i_t,1) == cond(1).trialinfo(i_t-1,1)
-      t = t + cfg.overlap * cfg.trldur;
-    else
-      t = cfg.pad + cfg.overlap * cfg.trldur;
-    end
-    
-  end
-  
-end
-
-[cond(1).trialinfo(:,[1 4]) decay_time] % check if it's good
-%-----------------%
-
-%-----------------%
 %-output
 output = sprintf('   n events:% 4d (total switch:% 4d at mindist% 4.2fs, maxdist% 4.2fs)\n', ...
   numel(find(enoughdist)), numel(mrk), min(cond(1).trialinfo(:,2)), max(cond(1).trialinfo(:,2)));
