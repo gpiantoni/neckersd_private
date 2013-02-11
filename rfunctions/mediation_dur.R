@@ -26,20 +26,14 @@ df <- df[,!(names(df) %in% c('pow', 'pow1', 'pow2', 'pow3', 'pow4'))]
 sink(outputfile, append=TRUE)
 cat('\n\n\nMEDIATION_DUR\n\n')
 
-dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess, data = df, mean) # average over electrodes
-
-#aggregate transforms them into numberic again
-dfp$day <- factor(dfp$day)
-dfp$sess <- ordered(dfp$sess)
-
-summary(dfp)
+summary(df)
 #-----------------#
 
 #-----------------#
 #-run models
-model1 <- lmer(dur ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
-model2 <- lmer(dur ~ cond + alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
-model3 <- lmer(alphapow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = dfp)
+model1 <- lmer(dur ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = df)
+model2 <- lmer(dur ~ cond + alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = df)
+model3 <- lmer(alphapow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = df)
 
 formula(model1)
 print(summary(model1)@coefs)

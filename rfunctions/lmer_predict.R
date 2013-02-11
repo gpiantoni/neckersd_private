@@ -25,27 +25,18 @@ df <- df[,!(names(df) %in% c('pow', 'pow1', 'pow2', 'pow3', 'pow4'))]
 
 sink(outputfile, append=TRUE)
 cat('\n\n\nLMER_PREDICT\n\n')
-
-dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess + time, data = df, mean) # average over electrodes
-
-#aggregate transforms them into numberic again
-dfp$day <- factor(dfp$day)
-dfp$time <- factor(dfp$time)
-dfp$sess <- ordered(dfp$sess)
-
-summary(dfp)
 #-----------------#
 
 #-----------------#
-tstat <- numeric(length(levels(dfp$time)))
+tstat <- numeric(length(levels(df$time)))
 cnt <- 0
-for (t in levels(dfp$time)){
-  lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns' & time==t))
+for (t in levels(df$time)){
+  lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns' & time==t))
   cnt <- cnt + 1
   tstat[cnt] <- summary(lm1)@coefs[2,3]
 }
 
-print(levels(dfp$time))
+print(levels(df$time))
 print(tstat, digits=2)
 #-----------------#
 
@@ -53,7 +44,7 @@ print(tstat, digits=2)
 #-to csv
 tocsv <- NULL
 tocsv[1] <- max(tstat)
-tocsv[2] <- levels(dfp$time)[which.max(tstat)]
+tocsv[2] <- levels(df$time)[which.max(tstat)]
 tocsv[3] <- sum(tstat > 1.95)
 tocsv[4] <- sum(tstat > 1.64)
 

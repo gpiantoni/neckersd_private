@@ -26,18 +26,12 @@ df <- df[,!(names(df) %in% c('pow', 'pow1', 'pow2', 'pow3', 'pow4'))]
 sink(outputfile, append=TRUE)
 cat('\n\n\nLMER_DUR_POW\n\n')
 
-dfp <- aggregate(cbind(alphapow, dur, day) ~ subj + cond + trl + sess, data = df, mean) # average over electrodes
-
-#aggregate transforms them into numberic again
-dfp$day <- factor(dfp$day)
-dfp$sess <- ordered(dfp$sess)
-
-summary(dfp)
+summary(df)
 #-----------------#
 
 #-----------------#
 print('XXX Power-duration Correlation (NS) XXX')
-lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='ns'))
+lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
 summary(lm1)
 est.ns.pow <- summary(lm1)@coefs[2,1]
 t.ns.pow <- summary(lm1)@coefs[2,3]
@@ -52,7 +46,7 @@ print(r2.corr.mer(lm1))
 
 #-----------------#
 print('XXX Power-duration Correlation (SD) XXX')
-lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(dfp, cond=='sd'))
+lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='sd'))
 summary(lm1)
 est.sd.pow <- summary(lm1)@coefs[2,1]
 t.sd.pow <- summary(lm1)@coefs[2,3]
@@ -60,14 +54,14 @@ t.sd.pow <- summary(lm1)@coefs[2,3]
 
 #-----------------#
 print('XXX Sleep Deprivation and Alpha Power XXX')
-lm1 <- lmer(alphapow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
+lm1 <- lmer(alphapow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), df)
 summary(lm1)
 #-----------------#
 
 #-----------------#
 #-model
 print('XXX Full MODEL: Sleep Deprivation and Alpha Power XXX')
-lm1 <- lmer(dur ~ alphapow * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), dfp)
+lm1 <- lmer(dur ~ alphapow * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), df)
 summary(lm1)
 sink()
 #-----------------#
