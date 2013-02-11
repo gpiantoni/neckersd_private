@@ -1,5 +1,5 @@
-function [cond output] = event2trl_trial(cfg, event)
-%EVENT2TRL_TRIAL create four types of trials based on stim and resp
+function [cond output] = event2trl_switch(cfg, event)
+%EVENT2TRL_SWITCH create four types of trials based on stim and resp
 % Use as:
 %   [cond output] = event2trl_trial(cfg, event)
 % where
@@ -14,6 +14,11 @@ function [cond output] = event2trl_trial(cfg, event)
 %     .trialinfo = extra_trialinfo (optional)
 %   output is a text for output
 %
+% trialinfo:
+%  - time from previous reversak (s)
+%  - time to following reversal (s)
+%  - time to following reversal (log(s))
+% 
 % Part of NECKERSD_PRIVATE
 % see also EVENT2TRL_INBETWEEN, EVENT2TRL_BOTH
 
