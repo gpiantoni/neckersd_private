@@ -35,22 +35,23 @@ summary(df)
 
 #-----------------#
 print('XXX Correlation ALPHAPOW ~ DIST XXX')
-lm0 <- lmer(alphapow ~ 1 + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
 lm1 <- lmer(alphapow ~ dist + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
 lm2 <- lmer(alphapow ~ dist + I(dist ^ 2) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
 lm3 <- lmer(alphapow ~ dist + I(dist ^ 2) + I(dist ^ 3) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
+print('XXX MODEL COMPARISONS XXX')
 anova(lm1, lm2, lm3)
-summary(lm1)
+
+print('XXX SUMMARY OF WINNING MODEL XXX')
 summary(lm2)
+
+findmax <- function(a,b){-b / (2*a)}
+sprintf('The peak of alpha is at %.2fs', findmax(fixef(lm2)[3], fixef(lm2)[2]))
 sink()
 #-----------------#
 
-
-pl <- subset(df, cond=='ns')
-pl$f <- fitted(lm2)
-pl$grp <- paste(pl$sess,pl$subj)
-p <- ggplot(pl, aes(x=dist, y=f, color=factor(subj)))
-p + geom_line(aes(group=grp)) +  theme_set(theme_bw(24))
-
-p
+# pl <- subset(df, cond=='ns')
+# pl$f <- fitted(lm2)
+# pl$grp <- paste(pl$sess,pl$subj)
+# p <- ggplot(pl, aes(x=dist, y=f, color=factor(subj)))
+# p + geom_line(aes(group=grp)) +  theme_set(theme_bw(24))
 
