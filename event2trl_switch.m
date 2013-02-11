@@ -18,6 +18,7 @@ function [cond output] = event2trl_switch(cfg, event)
 %  - time from previous reversak (s)
 %  - time to following reversal (s)
 %  - time to following reversal (log(s))
+%  - time from previous reversak (log(s)) NOT INTUITIVE, SORRY, TO KEEP PREVIOUS CODE
 % 
 % Part of NECKERSD_PRIVATE
 % see also EVENT2TRL_INBETWEEN, EVENT2TRL_BOTH
@@ -32,6 +33,7 @@ trl = [[event(mrk).sample] - cfg.prestim * cfg.fsample; ...
 
 info = [[event(mrk).offset]' [event(mrk).duration]']; % there are the same but switch by one place
 info(:,3) = log(info(:,2));
+info(:,4) = log(info(:,1));
 %-----------------%
 
 %-----------------%
