@@ -29,15 +29,28 @@ colnames(df)[6] <- 'dist'
 sink(outputfile, append=TRUE)
 cat('\n\n\nLMER_DECAY\n\n')
 
+df$dist <- -1 * df$dist
 summary(df)
 #-----------------#
 
 #-----------------#
 print('XXX Correlation ALPHAPOW ~ DIST XXX')
+lm0 <- lmer(alphapow ~ 1 + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
 lm1 <- lmer(alphapow ~ dist + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
+lm2 <- lmer(alphapow ~ dist + I(dist ^ 2) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
+lm3 <- lmer(alphapow ~ dist + I(dist ^ 2) + I(dist ^ 3) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
+anova(lm1, lm2, lm3)
 summary(lm1)
+summary(lm2)
 sink()
 #-----------------#
 
-# p <- ggplot(df, aes(x=dist, y=alphapow, color=factor(subj)))
-# p + geom_point()
+
+pl <- subset(df, cond=='ns')
+pl$f <- fitted(lm2)
+pl$grp <- paste(pl$sess,pl$subj)
+p <- ggplot(pl, aes(x=dist, y=f, color=factor(subj)))
+p + geom_line(aes(group=grp)) +  theme_set(theme_bw(24))
+
+p
+
