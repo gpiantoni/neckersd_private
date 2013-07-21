@@ -9,7 +9,7 @@ args <- commandArgs(TRUE)
 
 #-----------------#
 #-read the data
-if file.exists(args[[1]]){
+if (file.exists(args[[1]])) {
   df <- read.csv(args[[1]], header=FALSE)
   colnames(df) <- c('subj', 'cond', 'day', 'sess', 'trl', 'dur', 'time', 'pow', 'pow1', 'pow2', 'pow3', 'pow4')
 

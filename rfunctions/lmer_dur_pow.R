@@ -10,7 +10,7 @@ args <- commandArgs(TRUE)
 
 #-----------------#
 #-library
-library('lme4')
+library('nlme')
 #-----------------#
 
 #-----------------#
@@ -31,51 +31,52 @@ summary(df)
 
 #-----------------#
 print('XXX Power-duration Correlation (NS) XXX')
-lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
+lm1 <- lme(dur ~ alphapow, random = ~ 1|subj/day/sess, subset(df, cond=='ns'))
 summary(lm1)
-est.ns.pow <- summary(lm1)@coefs[2,1]
-t.ns.pow <- summary(lm1)@coefs[2,3]
+est.ns.pow <- summary(lm1)$tTable[2,1]
+t.ns.pow <- summary(lm1)$tTable[2,3]
 
-r2.corr.mer <- function(m) {
-  lmfit <-  lm(model.response(m@frame) ~ fitted(m))
-  summary(lmfit)$r.squared
-}
-cat('\nR-squared\n')
-print(r2.corr.mer(lm1))
+#TODO: fix this
+# r2.corr.mer <- function(m) {
+#  lmfit <-  lm(model.response(m@frame) ~ fitted(m))
+#  summary(lmfit)$r.squared
+#}
+#cat('\nR-squared\n')
+#print(r2.corr.mer(lm1))
 #-----------------#
 
 #-----------------#
 print('XXX Power-duration Correlation (SD) XXX')
-lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='sd'))
+lm1 <- lme(dur ~ alphapow, random = ~ 1|subj/day/sess, subset(df, cond=='sd'))
 summary(lm1)
-est.sd.pow <- summary(lm1)@coefs[2,1]
-t.sd.pow <- summary(lm1)@coefs[2,3]
+est.sd.pow <- summary(lm1)$tTable[2,1]
+t.sd.pow <- summary(lm1)$tTable[2,3]
 #-----------------#
 
 #-----------------#
 print('XXX Sleep Deprivation and Alpha Power XXX')
-lm1 <- lmer(alphapow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), df)
+lm1 <- lme(alphapow ~ cond, random = ~ 1|subj/day/sess, df)
 summary(lm1)
 #-----------------#
 
 #-----------------#
 #-model
 print('XXX Full MODEL: Sleep Deprivation and Alpha Power XXX')
-lm1 <- lmer(dur ~ alphapow * cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), df)
+lm1 <- lme(dur ~ alphapow * cond, random = ~ 1|subj/day/sess, df)
 summary(lm1)
 sink()
 #-----------------#
 
 #-----------------#
 #-write to file only the full model
-est.pow <- summary(lm1)@coefs[2,1]
-t.pow <- summary(lm1)@coefs[2,3]
+est.pow <- summary(lm1)$tTable[2,1]
+t.pow <- summary(lm1)$tTable[2,3]
 
-est.cond <- summary(lm1)@coefs[3,1]
-t.cond <- summary(lm1)@coefs[3,3]
+est.cond <- summary(lm1)$tTable[3,1]
+t.cond <- summary(lm1)$tTable[3,3]
 
-est.int <- summary(lm1)@coefs[4,1]
-t.int <- summary(lm1)@coefs[4,3]
+est.int <- summary(lm1)$tTable[4,1]
+t.int <- summary(lm1)$tTable[4,3]
 tocsv <- c(t.ns.pow, t.sd.pow, t.pow, t.cond, t.int)
 
 infofile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'output_main', '.csv', sep='')

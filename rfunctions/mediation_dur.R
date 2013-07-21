@@ -10,7 +10,7 @@ args <- commandArgs(TRUE)
 
 #-----------------#
 #-library
-library('lme4')
+library('nlme')
 #-----------------#
 
 #-----------------#
@@ -31,28 +31,28 @@ summary(df)
 
 #-----------------#
 #-run models
-model1 <- lmer(dur ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = df)
-model2 <- lmer(dur ~ cond + alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = df)
-model3 <- lmer(alphapow ~ cond + (1|subj) + (1|day:subj) + (1|sess:day:subj), data = df)
+model1 <- lme(dur ~ cond, random = ~ 1|subj/day/sess, data = df)
+model2 <- lme(dur ~ cond + alphapow, random = ~ 1|subj/day/sess, data = df)
+model3 <- lme(alphapow ~ cond, random = ~ 1|subj/day/sess, data = df)
 
 formula(model1)
-print(summary(model1)@coefs)
+print(summary(model1)$tTable)
 formula(model2)
-print(summary(model2)@coefs)
+print(summary(model2)$tTable)
 formula(model3)
-print(summary(model3)@coefs)
+print(summary(model3)$tTable)
 #-----------------#
 
 #-----------------#
 #-collect and print info
-r.1 <- summary(model1)@coefs[2,1]
-se.1 <- summary(model1)@coefs[2,2]
+r.1 <- summary(model1)$tTable[2,1]
+se.1 <- summary(model1)$tTable[2,2]
 
-r.2b <- summary(model2)@coefs[3,1]
-se.2b <- summary(model2)@coefs[3,2]
+r.2b <- summary(model2)$tTable[3,1]
+se.2b <- summary(model2)$tTable[3,2]
 
-r.3 <- summary(model3)@coefs[2,1]
-se.3 <- summary(model3)@coefs[2,2]
+r.3 <- summary(model3)$tTable[2,1]
+se.3 <- summary(model3)$tTable[2,2]
 
 indir <- r.3 * r.2b
 effvar <- r.3^2 * se.2b^2 + r.2b^2 * se.3^2
