@@ -35,9 +35,9 @@ summary(df)
 
 #-----------------#
 print('XXX Correlation ALPHAPOW ~ DIST XXX')
-lm1 <- lmer(alphapow ~ dist + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
-lm2 <- lmer(alphapow ~ dist + I(dist ^ 2) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
-lm3 <- lmer(alphapow ~ dist + I(dist ^ 2) + I(dist ^ 3) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
+lm1 <- lmer(alphapow ~ dist + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'), REML=FALSE)
+lm2 <- lmer(alphapow ~ dist + I(dist ^ 2) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'), REML=FALSE)
+lm3 <- lmer(alphapow ~ dist + I(dist ^ 2) + I(dist ^ 3) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'), REML=FALSE)
 print('XXX MODEL COMPARISONS XXX')
 anova(lm1, lm2, lm3)
 

@@ -33,7 +33,7 @@ cnt <- 0
 for (t in levels(df$time)){
   lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns' & time==t))
   cnt <- cnt + 1
-  tstat[cnt] <- summary(lm1)@coefs[2,3]
+  tstat[cnt] <- summary(lm1)$coefficients[2,3]
 }
 
 print(levels(df$time))

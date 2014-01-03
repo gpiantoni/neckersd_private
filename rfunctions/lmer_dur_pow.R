@@ -33,8 +33,8 @@ summary(df)
 print('XXX Power-duration Correlation (NS) XXX')
 lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'))
 summary(lm1)
-est.ns.pow <- summary(lm1)@coefs[2,1]
-t.ns.pow <- summary(lm1)@coefs[2,3]
+est.ns.pow <- summary(lm1)$coefficients[2,1]
+t.ns.pow <- summary(lm1)$coefficients[2,3]
 
 r2.corr.mer <- function(m) {
   lmfit <-  lm(model.response(m@frame) ~ fitted(m))
@@ -48,8 +48,8 @@ print(r2.corr.mer(lm1))
 print('XXX Power-duration Correlation (SD) XXX')
 lm1 <- lmer(dur ~ alphapow + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='sd'))
 summary(lm1)
-est.sd.pow <- summary(lm1)@coefs[2,1]
-t.sd.pow <- summary(lm1)@coefs[2,3]
+est.sd.pow <- summary(lm1)$coefficients[2,1]
+t.sd.pow <- summary(lm1)$coefficients[2,3]
 #-----------------#
 
 #-----------------#
@@ -68,14 +68,14 @@ sink()
 
 #-----------------#
 #-write to file only the full model
-est.pow <- summary(lm1)@coefs[2,1]
-t.pow <- summary(lm1)@coefs[2,3]
+est.pow <- summary(lm1)$coefficients[2,1]
+t.pow <- summary(lm1)$coefficients[2,3]
 
-est.cond <- summary(lm1)@coefs[3,1]
-t.cond <- summary(lm1)@coefs[3,3]
+est.cond <- summary(lm1)$coefficients[3,1]
+t.cond <- summary(lm1)$coefficients[3,3]
 
-est.int <- summary(lm1)@coefs[4,1]
-t.int <- summary(lm1)@coefs[4,3]
+est.int <- summary(lm1)$coefficients[4,1]
+t.int <- summary(lm1)$coefficients[4,3]
 tocsv <- c(t.ns.pow, t.sd.pow, t.pow, t.cond, t.int)
 
 infofile <- paste(substr(outputfile, 1, nchar(outputfile)-12), 'output_main', '.csv', sep='')

@@ -26,7 +26,7 @@ powcorr <- numeric(0)
 
 for (e in levels(df$pos)){
   lm1 <- lmer(dur ~ pow + (1|subj) + (1|sess:subj), subset(df, pos==e))
-  powcorr[e]  <- (summary(lm1))@coefs[2,3]
+  powcorr[e]  <- (summary(lm1))$coefficients[2,3]
   }
 #-----------------#
 
