@@ -9,8 +9,6 @@ function decay_to_baseline(info, opt)
 %  .powtype : type of power computations
 %  .baseline : two scalars, length of the baseline (f.e. [-1.5 -1.5])
 
-opt.baseline = [-2 -1.5];
-
 %---------------------------%
 %-start log
 output = sprintf('%s began at %s on %s\n', ...
