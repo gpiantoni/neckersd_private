@@ -35,17 +35,15 @@ summary(df)
 
 #-----------------#
 print('XXX Correlation ALPHAPOW ~ DIST XXX')
-lm1 <- lmer(alphapow ~ dist + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'), REML=FALSE)
-lm2 <- lmer(alphapow ~ dist + I(dist ^ 2) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'), REML=FALSE)
-lm3 <- lmer(alphapow ~ dist + I(dist ^ 2) + I(dist ^ 3) + (1|subj) + (1|day:subj) + (1|sess:day:subj), subset(df, cond=='ns'), REML=FALSE)
+lm0 <- lmer(alphapow ~ 1 + (1|subj) + (1|day:subj) + (1|sess:day:subj) + (1|trl:sess:day:subj), subset(df, cond=='ns'), REML=FALSE)
+lm1 <- lmer(alphapow ~ dist + (1|subj) + (1|day:subj) + (1|sess:day:subj) + (1|trl:sess:day:subj), subset(df, cond=='ns'), REML=FALSE)
+lm2 <- lmer(alphapow ~ dist + I(dist ^ 2) + (1|subj) + (1|day:subj) + (1|sess:day:subj) + (1|trl:sess:day:subj), subset(df, cond=='ns'), REML=FALSE)
 print('XXX MODEL COMPARISONS XXX')
-anova(lm1, lm2, lm3)
+anova(lm0, lm1, lm2)
 
 print('XXX SUMMARY OF WINNING MODEL XXX')
-summary(lm2)
+summary(lm1)
 
-findmax <- function(a,b){-b / (2*a)}
-sprintf('The peak of alpha is at %.2fs', findmax(fixef(lm2)[3], fixef(lm2)[2]))
 sink()
 #-----------------#
 
