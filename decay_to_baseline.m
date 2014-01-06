@@ -5,9 +5,9 @@ function decay_to_baseline(info, opt)
 %  .log
 %
 % CFG.OPT
-%  .csvname
-%  .powtype 
-%  .baseline
+%  .csvname : name of the csv file for all the subjects
+%  .powtype : type of power computations
+%  .baseline : two scalars, length of the baseline (f.e. [-1.5 -1.5])
 
 opt.baseline = [-2 -1.5];
 
@@ -114,10 +114,10 @@ m = nanmean(subj_timecourse);
 sd = nanstd(subj_timecourse);
 sem = sd ./ sqrt(n);
 
-output = [output sprintf('% 5.1f\t', unique(decay.dur)') '\n'];
-output = [output sprintf('%0.4f\t', m) '\n'];
-output = [output sprintf('%0.4f\t', sem) '\n'];
-output = [output sprintf('%d\t', n) '\n'];
+output = [output sprintf('% 5.1f\t', unique(decay.dur)') sprintf('\n')];
+output = [output sprintf('%0.4f\t', m) sprintf('\n')];
+output = [output sprintf('%0.4f\t', sem) sprintf('\n')];
+output = [output sprintf('%d\t', n) sprintf('\n')];
 %---------------------------%
 
 %---------------------------%
