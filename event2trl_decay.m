@@ -5,6 +5,8 @@ function [cond output] = event2trl_decay(cfg, event)
 % where
 %   cfg is cfg.redef
 %   cfg.redef.trigger = 'switch';
+%   cfg.redef.interval = 'before' or 'after'; % specify which interval to
+%     use, before or after the switches (default: 'after')
 %   cfg.redef.mindist = 1; % distance to following switch
 %   cfg.redef.maxdist = 60; % distance to following switch
 %   cfg.redef.pad     = 0.5; % skip the part next to the switch
@@ -24,8 +26,13 @@ function [cond output] = event2trl_decay(cfg, event)
 %-create trl where there is a switch
 mrk = find(strcmp({event.type}, cfg.trigger));
 
-mrkbnd_orig = [[event(mrk).sample]' [event(mrk+1).sample]'];
-inbetween = [event(mrk).duration]';
+if ~isfield(cfg, 'interval') || strcmp(cfg.interval, 'after')
+  mrkbnd_orig = [[event(mrk).sample]' [event(mrk+1).sample]'];
+  inbetween = [event(mrk).duration]';
+else
+  mrkbnd_orig = [[event(mrk-1).sample]' [event(mrk).sample]'];
+  inbetween = [event(mrk).offset]';
+end
 
 %-------%
 %-avoid data just around the switch
