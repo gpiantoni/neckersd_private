@@ -98,9 +98,11 @@ end
 %---------------------------%
 
 %---------------------------%
+sel_cond = timecourse(:, 2) == 1; % only normal sleep
+
 subj_timecourse = nan(numel(unique(decay.subj)), size(timecourse, 2) - 4);
 for s = unique(decay.subj)'
-  i_row = timecourse(:, 1) == s & timecourse(:, 2) == 2;
+  i_row = timecourse(:, 1) == s & sel_cond;
   subj_timecourse(s, :) = nanmean(timecourse(i_row, 5:end));
 end
 %---------------------------%
