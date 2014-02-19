@@ -8,6 +8,14 @@ function decay_to_baseline(info, opt)
 %  .csvname : name of the csv file for all the subjects
 %  .powtype : type of power computations
 %  .baseline : two scalars, length of the baseline (f.e. [-1.5 -1.5])
+%            or str 'first_epoch' (if you want to use the first epoch as 
+%            baseline
+%  .baseline_type : 'log' or 'diff'
+%  .grandavg : bool (if true, compute first grand average. Otherwise, do it
+%              over trials)
+%  .cond : 'ns' or 'sd' or 'both'
+%  .maxdist : max distance used to calculate correlation (should be
+%             negative)
 
 %---------------------------%
 %-start log
@@ -22,7 +30,6 @@ colnames = {'subj', 'cond', 'day', 'sess', 'trl', 'dur', 'time', 'pow', 'pow1', 
 for col = 1:numel(colnames)
   decay.(colnames{col}) = [];
 end
-
 
 f = fopen(opt.csvname, 'r');
 cnt = 0;
@@ -51,12 +58,13 @@ decay.dur = -1 * decay.dur;
 %---------------------------%
 
 %---------------------------%
-%-normalize to baseline
+%-create full matrix, where each row is one interval
 all_combinations = double(decay.subj) * 1e6 + double(decay.cond) * 1e5 + double(decay.sess) * 1e4 + double(decay.trl);
 n_rows = numel(unique(all_combinations));
 
 col_timecourse = {'subj', 'cond', 'sess', 'trl'};
-for i = unique(decay.dur)'
+all_dist = unique(decay.dur)';
+for i = all_dist
   col_timecourse = [col_timecourse sprintf('%06.1f', i)]; 
 end
 
@@ -89,21 +97,44 @@ end
 
 %---------------------------%
 %-correct baseline
-bl1 = find(strcmp(col_timecourse, sprintf('%06.1f', opt.baseline(1))));
-bl2 = find(strcmp(col_timecourse, sprintf('%06.1f', opt.baseline(2))));
+if numel(opt.baseline) == 2
+  bl1 = find(strcmp(col_timecourse, sprintf('%06.1f', opt.baseline(1))));
+  bl2 = find(strcmp(col_timecourse, sprintf('%06.1f', opt.baseline(2))));
+end
 
 for i = 1:size(timecourse, 1)
-  timecourse(i, 5:end) = log(timecourse(i, 5:end) / nanmean(timecourse(i, bl1:bl2)));  
+
+  if strcmp(opt.baseline, 'first_epoch')
+    baseline = timecourse(i, find(~isnan(timecourse(i, 5:end)), 1 ) + 4);
+  elseif numel(opt.baseline) == 2
+    baseline = nanmean(timecourse(i, bl1:bl2));
+  end
+  
+  if strcmp(opt.baseline_type, 'log')
+    timecourse(i, 5:end) = log(timecourse(i, 5:end) / baseline);  
+  elseif strcmp(opt.baseline_type, 'diff')
+    timecourse(i, 5:end) = timecourse(i, 5:end) - baseline;  
+  end
 end
 %---------------------------%
 
 %---------------------------%
-sel_cond = timecourse(:, 2) == 1; % only normal sleep
+if strcmp(opt.cond, 'ns')
+  sel_cond = timecourse(:, 2) == 1; % only after normal sleep
+elseif strcmp(opt.cond, 'sd')
+  sel_cond = timecourse(:, 2) == 2; % only after sleep deprivation
+elseif strcmp(opt.cond, 'both')
+  sel_cond = true(size(timecourse, 1), 1);
+end
 
-subj_timecourse = nan(numel(unique(decay.subj)), size(timecourse, 2) - 4);
-for s = unique(decay.subj)'
-  i_row = timecourse(:, 1) == s & sel_cond;
-  subj_timecourse(s, :) = nanmean(timecourse(i_row, 5:end));
+if opt.grandavg
+  subj_timecourse = nan(numel(unique(decay.subj)), size(timecourse, 2) - 4);
+  for s = unique(decay.subj)'
+    i_row = timecourse(:, 1) == s & sel_cond;
+    subj_timecourse(s, :) = nanmean(timecourse(i_row, 5:end));
+  end
+else
+  subj_timecourse = timecourse(sel_cond, 5:end);
 end
 %---------------------------%
 
@@ -114,7 +145,7 @@ m = nanmean(subj_timecourse);
 sd = nanstd(subj_timecourse);
 sem = sd ./ sqrt(n);
 
-output = [output sprintf('% 5.1f\t', unique(decay.dur)') sprintf('\n')];
+output = [output sprintf('% 5.1f\t', all_dist) sprintf('\n')];
 output = [output sprintf('%0.4f\t', m) sprintf('\n')];
 output = [output sprintf('%0.4f\t', sem) sprintf('\n')];
 output = [output sprintf('%d\t', n) sprintf('\n')];
@@ -124,11 +155,19 @@ output = [output sprintf('%d\t', n) sprintf('\n')];
 %-plot
 h = figure('vis', 'off');
 hold on
-plot( unique(decay.dur)', m)
-plot( unique(decay.dur)', m + sem / 2, 'color',[.5 .5 .5])
-plot( unique(decay.dur)', m - sem / 2, 'color',[.5 .5 .5])
+plot( all_dist, m)
+plot( all_dist, m + sem / 2, 'color',[.5 .5 .5])
+plot( all_dist, m - sem / 2, 'color',[.5 .5 .5])
 saveas(h, [info.log filesep 'alpha_decay.png'])
 saveas(h, [info.log filesep 'alpha_decay.pdf'])
+%---------------------------%
+
+%---------------------------%
+%-calculate R-value
+sel_dur = all_dist(all_dist >= opt.maxdist); 
+sel_m = m(all_dist >= opt.maxdist);
+[r, p] = corr(sel_dur', sel_m');
+output = [output sprintf('correlation R=%0.4f, p=%0.3f\n', r, p)];
 %---------------------------%
 
 %---------------------------%
