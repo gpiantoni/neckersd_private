@@ -139,7 +139,7 @@ end
 %---------------------------%
 
 %---------------------------%
-%-make a plot
+%-save to output
 n = sum(~isnan(subj_timecourse), 1);
 m = nanmean(subj_timecourse);
 sd = nanstd(subj_timecourse);
@@ -152,14 +152,24 @@ output = [output sprintf('%d\t', n) sprintf('\n')];
 %---------------------------%
 
 %---------------------------%
+%-save to csv
+csv_file = fopen([info.log filesep 'alpha_decay.csv'], 'w');
+fwrite(csv_file, [sprintf('% 5.1f,', all_dist) sprintf('\n')]);
+fwrite(csv_file, [sprintf('% 0.4f,', m) sprintf('\n')]);
+fwrite(csv_file, [sprintf('% 0.4f,', sem) sprintf('\n')]);
+fwrite(csv_file, [sprintf('%d,', n) sprintf('\n')]);
+fclose(csv_file);
+%---------------------------%
+
+%---------------------------%
 %-plot
 h = figure('vis', 'off');
 hold on
 plot( all_dist, m)
-plot( all_dist, m + sem / 2, 'color',[.5 .5 .5])
-plot( all_dist, m - sem / 2, 'color',[.5 .5 .5])
-saveas(h, [info.log filesep 'alpha_decay.png'])
-saveas(h, [info.log filesep 'alpha_decay.pdf'])
+plot( all_dist, m + sem / 2, 'color',[.5 .5 .5]);
+plot( all_dist, m - sem / 2, 'color',[.5 .5 .5]);
+saveas(h, [info.log filesep 'alpha_decay.png']);
+saveas(h, [info.log filesep 'alpha_decay.pdf']);
 %---------------------------%
 
 %---------------------------%
