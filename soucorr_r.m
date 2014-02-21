@@ -14,7 +14,10 @@ tic_t = tic;
 rdir = [info.scrp info.nick '_private/rfunctions/'];
 funname = [rdir 'lmer_source.R'];
 args = [info.dcor ' ' info.log filesep];
+MatlabPath = getenv('LD_LIBRARY_PATH');
+setenv('LD_LIBRARY_PATH', getenv('PATH'))
 system(['Rscript ' funname ' ' args]);
+setenv('LD_LIBRARY_PATH', MatlabPath)
 %---------------------------%
 
 %---------------------------%
